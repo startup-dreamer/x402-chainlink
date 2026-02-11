@@ -1,0 +1,113 @@
+{
+  "name": "x402-chainlink",
+  "version": "1.0.0",
+  "description": "Chainlink CRE implementation of the x402 payment protocol for EVM chains",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE",
+    "x402-workflow/compiled-workflow.js",
+    "x402-workflow/workflow.yaml",
+    "x402-workflow/config.staging.json",
+    "x402-workflow/config.production.json",
+    "x402-workflow/abi/"
+  ],
+  "scripts": {
+    "build": "bun run build:ts",
+    "build:ts": "tsc -p tsconfig.json",
+    "test": "vitest run --coverage",
+    "test:watch": "vitest",
+    "test:docs": "vitest run tests/docs/",
+    "typecheck": "tsc --noEmit",
+    "typecheck:examples": "tsc -p tsconfig.examples.json --noEmit",
+    "validate:examples": "bun run build && bun run typecheck:examples && bun run test:docs",
+    "lint": "eslint . --max-warnings=0",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier . -w",
+    "format:check": "prettier . -c",
+    "check": "bun run format:check && bun run typecheck && bun run lint",
+    "dev": "bun run --watch src/index.ts",
+    "clean": "rm -rf dist",
+    "docs:build": "typedoc",
+    "deploy": "gh-pages -d docs"
+  },
+  "keywords": [
+    "x402",
+    "chainlink",
+    "cre",
+    "payments",
+    "micropayments",
+    "http",
+    "blockchain",
+    "evm",
+    "ethereum",
+    "base",
+    "polygon",
+    "arbitrum"
+  ],
+  "author": "Krieger",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/startup-dreamer/x402-chainlink.git"
+  },
+  "bugs": {
+    "url": "https://github.com/startup-dreamer/x402-chainlink/issues"
+  },
+  "homepage": "https://github.com/startup-dreamer/x402-chainlink/blob/main/README.md",
+  "dependencies": {
+    "@solana/web3.js": "^1.98.4",
+    "bs58": "^6.0.0",
+    "express": "^5.2.1",
+    "typedoc": "^0.28.17",
+    "zod": "^4.2.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@types/bun": "latest",
+    "@types/express": "^5.0.6",
+    "@typescript-eslint/eslint-plugin": "^8.50.0",
+    "@typescript-eslint/parser": "^8.50.0",
+    "@vitest/coverage-v8": "^4.0.16",
+    "eslint": "^9.39.2",
+    "eslint-plugin-sonarjs": "^3.0.5",
+    "eslint-plugin-unicorn": "^62.0.0",
+    "eslint-plugin-unused-imports": "^4.3.0",
+    "gh-pages": "^6.3.0",
+    "globals": "^16.5.0",
+    "prettier": "^3.7.4",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.50.0",
+    "viem": "^2.21.0",
+    "vitest": "^4.0.16"
+  },
+  "peerDependencies": {
+    "viem": "^2.21.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js}": [
+      "eslint --fix",
+      "prettier -w"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier -w"
+    ]
+  }
+}
