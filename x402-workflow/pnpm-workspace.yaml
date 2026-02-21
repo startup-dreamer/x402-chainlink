@@ -1,0 +1,2 @@
+patchedDependencies:
+  '@chainlink/cre-sdk@1.1.1': patches/@chainlink__cre-sdk@1.1.1.patch
