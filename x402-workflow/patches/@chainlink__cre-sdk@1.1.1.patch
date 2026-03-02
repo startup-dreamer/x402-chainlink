@@ -1,0 +1,142 @@
+diff --git a/dist/sdk/utils/prepare-runtime.js b/dist/sdk/utils/prepare-runtime.js
+index a058141b2f8ffd34b03136e9208e0a108c4e7a66..4d109aa429f3c43d951b82e3aa38ddc13c8790f9 100644
+--- a/dist/sdk/utils/prepare-runtime.js
++++ b/dist/sdk/utils/prepare-runtime.js
+@@ -1,9 +1,12 @@
+-import { Buffer } from 'node:buffer';
+ /**
+  * This function is used to prepare the runtime for the SDK to work.
+  * It should be called as a part of SDK initialization.
+  * It exposes NodeJS Buffer in global namespace, so it can be bundled and used in workflow code.
++ * Note: The import from 'node:buffer' was removed to allow browser-target bundling with Bun.
++ * Buffer is available as a Node.js global at runtime or injected as a polyfill by compile-to-js.
+  */
+ export const prepareRuntime = () => {
+-    globalThis.Buffer = Buffer;
++    if (typeof globalThis.Buffer === 'undefined' && typeof Buffer !== 'undefined') {
++        globalThis.Buffer = Buffer;
++    }
+ };
+diff --git a/scripts/src/compile-to-js.ts b/scripts/src/compile-to-js.ts
+index 250b36efe272c96bc851ba6167379ae0b3658a7d..092cb130bf7d2d33e4687204e7af26c66d0d1c6d 100644
+--- a/scripts/src/compile-to-js.ts
++++ b/scripts/src/compile-to-js.ts
+@@ -4,6 +4,52 @@ import path from 'node:path'
+ import { $ } from 'bun'
+ import { wrapWorkflowCode } from './workflow-wrapper'
+ 
++const BUFFER_POLYFILL = `
++// Buffer polyfill for Javy runtime
++var Buffer = (() => {
++  const _base64Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
++  const _base64Decode = (str) => {
++    let result = '';
++    str = str.replace(/=+$/, '');
++    for (let i = 0; i < str.length; i += 4) {
++      const a = _base64Chars.indexOf(str[i]);
++      const b = _base64Chars.indexOf(str[i + 1]);
++      const c = _base64Chars.indexOf(str[i + 2]);
++      const d = _base64Chars.indexOf(str[i + 3]);
++      const n = (a << 18) | (b << 12) | (c << 6) | d;
++      result += String.fromCharCode((n >> 16) & 0xFF);
++      if (c !== -1) result += String.fromCharCode((n >> 8) & 0xFF);
++      if (d !== -1) result += String.fromCharCode(n & 0xFF);
++    }
++    return result;
++  };
++  const BufferImpl = function(data, encoding) {
++    if (typeof data === 'string') {
++      if (encoding === 'base64') {
++        const binary = _base64Decode(data);
++        const bytes = new Uint8Array(binary.length);
++        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
++        return bytes;
++      } else if (encoding === 'hex') {
++        const bytes = new Uint8Array(data.length / 2);
++        for (let i = 0; i < data.length; i += 2) bytes[i / 2] = parseInt(data.substr(i, 2), 16);
++        return bytes;
++      }
++      return new TextEncoder().encode(data);
++    }
++    if (Array.isArray(data)) return new Uint8Array(data);
++    return data;
++  };
++  BufferImpl.from = BufferImpl;
++  BufferImpl.prototype = Uint8Array.prototype;
++  BufferImpl.prototype.toString = function(encoding) {
++    if (encoding === 'hex') return Array.from(this).map(b => b.toString(16).padStart(2, '0')).join('');
++    if (encoding === 'base64') {
++      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
++      let result = '';
++      const len = this.length;
++      for (let i = 0; i < len; i += 3) {
++        const b0 = this[i];
++        const b1 = i + 1 < len ? this[i + 1] : 0;
++        const b2 = i + 2 < len ? this[i + 2] : 0;
++        const rem = len - i;
++        result += chars[b0 >> 2];
++        result += chars[((b0 & 3) << 4) | (b1 >> 4)];
++        result += rem > 1 ? chars[((b1 & 15) << 2) | (b2 >> 6)] : '=';
++        result += rem > 2 ? chars[b2 & 63] : '=';
++      }
++      return result;
++    }
++    return new TextDecoder().decode(this);
++  };
++  return BufferImpl;
++})();
++`
++
+ export const main = async (tsFilePath?: string, outputFilePath?: string) => {
+ 	const cliArgs = process.argv.slice(3)
+ 
+@@ -46,14 +92,23 @@ export const main = async (tsFilePath?: string, outputFilePath?: string) => {
+ 
+ 	try {
+ 		// Build step (emit next to output file, then overwrite)
+-		await Bun.build({
++		// node:buffer and buffer are marked external so Bun doesn't fail on browser target;
++		// the Buffer polyfill is injected as a post-processing step below.
++		const buildResult = await Bun.build({
+ 			entrypoints: [tempFile],
+ 			outdir: path.dirname(resolvedOutput),
+ 			target: 'browser',
+ 			format: 'esm',
+ 			naming: path.basename(resolvedOutput),
++			external: ['node:buffer', 'buffer'],
+ 		})
+ 
++		if (!buildResult.success) {
++			console.error('❌ Build failed:')
++			for (const log of buildResult.logs) console.error(log)
++			process.exit(1)
++		}
++
+ 		// The file Bun will emit before bundling
+ 		const builtFile = path.join(path.dirname(resolvedOutput), path.basename(resolvedOutput))
+ 
+@@ -62,8 +117,22 @@ export const main = async (tsFilePath?: string, outputFilePath?: string) => {
+ 			process.exit(1)
+ 		}
+ 
+-		// Bundle into the final file (overwrite)
+-		await $`bun build ${builtFile} --bundle --outfile=${resolvedOutput}`
++		// Bundle into the final file (overwrite), keeping node:buffer external
++		await $`bun build ${builtFile} --target=browser --bundle --outfile=${resolvedOutput} --external:node:buffer --external:buffer`
++
++		// Inject Buffer polyfill to replace any node:buffer imports in the output
++		let jsContent = readFileSync(resolvedOutput, 'utf-8')
++		const bufferImportRegex = /import\s*\{?\s*Buffer\s*\}?\s*from\s*['"](node:)?buffer['"];?/g
++		if (bufferImportRegex.test(jsContent)) {
++			console.info('📝 Injecting Buffer polyfill...')
++			jsContent = jsContent.replace(bufferImportRegex, '')
++			jsContent = BUFFER_POLYFILL + '\n' + jsContent
++			writeFileSync(resolvedOutput, jsContent, 'utf-8')
++		} else if (jsContent.includes('Buffer')) {
++			console.info('📝 Buffer usage detected, injecting polyfill...')
++			jsContent = BUFFER_POLYFILL + '\n' + jsContent
++			writeFileSync(resolvedOutput, jsContent, 'utf-8')
++		}
+ 
+ 		console.info(`✅ Built: ${resolvedOutput}`)
+ 		return resolvedOutput

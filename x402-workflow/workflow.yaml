@@ -1,0 +1,20 @@
+# x402 Payment Workflow Configuration
+# This file defines workflow settings for different environments
+
+# Staging environment (testnets)
+staging-settings:
+  user-workflow:
+    workflow-name: "x402-payment-workflow-staging"
+  workflow-artifacts:
+    workflow-path: "./compiled-workflow.js"
+    config-path: "./config.staging.json"
+    secrets-path: ""
+
+# Production environment (mainnets)
+production-settings:
+  user-workflow:
+    workflow-name: "x402-payment-workflow-production"
+  workflow-artifacts:
+    workflow-path: "./compiled-workflow.js"
+    config-path: "./config.production.json"
+    secrets-path: ""
