@@ -75,7 +75,7 @@ export interface IDiscoveryClient {
  * // Discover resources
  * const resources = await client.discover({
  *   type: 'http',
- *   network: 'starknet:sepolia',
+ *   network: 'base:sepolia',
  *   limit: 10,
  * });
  *
