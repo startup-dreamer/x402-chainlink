@@ -1,0 +1,10 @@
+{
+    "entryPoints": ["src/index.ts"],
+    "out": "docs",
+    "excludePrivate": true,
+    "excludeProtected": true,
+    "excludeInternal": true,
+    "excludeExternals": true,
+    "hideGenerator": true,
+    "categorizeByGroup": false
+  }

@@ -1,0 +1,60 @@
+# x402 Payment Protocol - CRE Project Configuration
+staging-settings:
+  rpcs:
+    # Base Sepolia (Primary testnet for x402)
+    - chain-name: ethereum-testnet-sepolia-base-1
+      url: https://sepolia.base.org
+
+    # Ethereum Sepolia (For cross-chain testing)
+    - chain-name: ethereum-testnet-sepolia
+      url: https://ethereum-sepolia-rpc.publicnode.com
+
+    # Arbitrum Sepolia (Additional L2 testnet)
+    - chain-name: ethereum-testnet-sepolia-arbitrum-1
+      url: https://sepolia-rollup.arbitrum.io/rpc
+
+    # Optimism Sepolia (Additional L2 testnet)
+    - chain-name: ethereum-testnet-sepolia-optimism-1
+      url: https://sepolia.optimism.io
+
+  account:
+    # Workflow owner address (fill this with your account address after registration)
+    # Register at: https://cre.chain.link
+    workflow-owner-address: ''
+
+production-settings:
+  rpcs:
+    # Base Mainnet (Primary production chain for x402)
+    - chain-name: base-mainnet
+      url: https://mainnet.base.org
+
+    # Ethereum Mainnet
+    - chain-name: ethereum-mainnet
+      url: https://ethereum-rpc.publicnode.com
+
+    # Arbitrum One
+    - chain-name: arbitrum-mainnet
+      url: https://arb1.arbitrum.io/rpc
+
+    # Optimism Mainnet
+    - chain-name: optimism-mainnet
+      url: https://mainnet.optimism.io
+
+  account:
+    # Production workflow owner address
+    # WARNING: This should be a secure multisig or hardware wallet address
+    workflow-owner-address: ''
+
+# ============================================================================
+# Forwarder Addresses (Reference)
+# ============================================================================
+#
+# MockForwarder (for simulation):
+#   - Base Sepolia: 0x15fC6ae953E024d975e77382eEeC56A9101f9F88
+#   - Ethereum Sepolia: 0x15fC6ae953E024d975e77382eEeC56A9101f9F88
+#
+# KeystoneForwarder (for production):
+#   - Base Sepolia: 0x1a1c2103A4BCb04F548e9525D4cc33Ac47f1Ec44
+#   - Ethereum Sepolia: 0xF8344CFd5c43616a4366C34E3EEE75af79a74482
+#
+# ============================================================================
