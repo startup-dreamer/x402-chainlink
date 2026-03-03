@@ -82,22 +82,173 @@ const client = createPublicClient({
 // Provider via x402-chainlink helper (used for weather settlement)
 const publicClient = createProvider(NETWORK);
 
-const weatherData = {
-  location: 'San Francisco, CA',
-  temperature: 68,
-  unit: 'F',
-  condition: 'Partly Cloudy',
-  humidity: 65,
-  windSpeed: 12,
-  windDirection: 'NW',
-  forecast: [
-    { day: 'Monday', high: 70, low: 55, condition: 'Sunny' },
-    { day: 'Tuesday', high: 68, low: 54, condition: 'Cloudy' },
-    { day: 'Wednesday', high: 72, low: 56, condition: 'Sunny' },
-    { day: 'Thursday', high: 69, low: 53, condition: 'Partly Cloudy' },
-    { day: 'Friday', high: 67, low: 52, condition: 'Rain' },
-  ],
+// ── Open-Meteo weather helpers (free, no API key required) ───────────────────
+
+const WMO_CONDITIONS: Record<number, string> = {
+  0: 'Clear Sky',
+  1: 'Mainly Clear',
+  2: 'Partly Cloudy',
+  3: 'Overcast',
+  45: 'Foggy',
+  48: 'Icy Fog',
+  51: 'Light Drizzle',
+  53: 'Drizzle',
+  55: 'Heavy Drizzle',
+  61: 'Light Rain',
+  63: 'Rain',
+  65: 'Heavy Rain',
+  71: 'Light Snow',
+  73: 'Snow',
+  75: 'Heavy Snow',
+  80: 'Rain Showers',
+  81: 'Rain Showers',
+  82: 'Heavy Rain Showers',
+  95: 'Thunderstorm',
+  96: 'Thunderstorm w/ Hail',
+  99: 'Thunderstorm w/ Hail',
 };
+
+function wmoToCondition(code: number): string {
+  return WMO_CONDITIONS[code] ?? 'Unknown';
+}
+
+function degreesToCompass(deg: number): string {
+  const dirs = [
+    'N',
+    'NNE',
+    'NE',
+    'ENE',
+    'E',
+    'ESE',
+    'SE',
+    'SSE',
+    'S',
+    'SSW',
+    'SW',
+    'WSW',
+    'W',
+    'WNW',
+    'NW',
+    'NNW',
+  ];
+  return dirs[Math.round(deg / 22.5) % 16] ?? 'N';
+}
+
+function dayOfWeek(dateStr: string): string {
+  const days = [
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+  ];
+  return days[new Date(dateStr + 'T12:00:00Z').getUTCDay()] ?? dateStr;
+}
+
+interface GeoResult {
+  name: string;
+  lat: number;
+  lon: number;
+  country: string;
+}
+
+async function geocodeCity(query: string): Promise<GeoResult | null> {
+  const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=en&format=json`;
+  const res = await fetch(url);
+  if (!res.ok) return null;
+  const data = (await res.json()) as {
+    results?: Array<{
+      name: string;
+      latitude: number;
+      longitude: number;
+      country: string;
+    }>;
+  };
+  const r = data.results?.[0];
+  if (!r) return null;
+  return {
+    name: r.name,
+    lat: r.latitude,
+    lon: r.longitude,
+    country: r.country,
+  };
+}
+
+interface LiveWeatherData {
+  location: string;
+  temperature: number;
+  unit: string;
+  condition: string;
+  humidity: number;
+  windSpeed: number;
+  windDirection: string;
+  forecast: Array<{
+    day: string;
+    high: number;
+    low: number;
+    condition: string;
+  }>;
+  lastUpdated: string;
+}
+
+async function fetchWeatherData(
+  lat: number,
+  lon: number,
+  locationName: string
+): Promise<LiveWeatherData> {
+  const params = new URLSearchParams({
+    latitude: String(lat),
+    longitude: String(lon),
+    current:
+      'temperature_2m,relative_humidity_2m,windspeed_10m,winddirection_10m,weathercode',
+    daily: 'temperature_2m_max,temperature_2m_min,weathercode',
+    temperature_unit: 'fahrenheit',
+    windspeed_unit: 'mph',
+    timezone: 'auto',
+    forecast_days: '6',
+  });
+  const res = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`);
+  if (!res.ok)
+    throw new Error(`Open-Meteo error: ${res.status} ${res.statusText}`);
+
+  const data = (await res.json()) as {
+    current: {
+      temperature_2m: number;
+      relative_humidity_2m: number;
+      windspeed_10m: number;
+      winddirection_10m: number;
+      weathercode: number;
+    };
+    daily: {
+      time: string[];
+      temperature_2m_max: number[];
+      temperature_2m_min: number[];
+      weathercode: number[];
+    };
+  };
+
+  const c = data.current;
+  const forecast = data.daily.time.slice(1, 6).map((date, i) => ({
+    day: dayOfWeek(date),
+    high: Math.round(data.daily.temperature_2m_max[i + 1] ?? 0),
+    low: Math.round(data.daily.temperature_2m_min[i + 1] ?? 0),
+    condition: wmoToCondition(data.daily.weathercode[i + 1] ?? 0),
+  }));
+
+  return {
+    location: locationName,
+    temperature: Math.round(c.temperature_2m),
+    unit: 'F',
+    condition: wmoToCondition(c.weathercode),
+    humidity: Math.round(c.relative_humidity_2m),
+    windSpeed: Math.round(c.windspeed_10m),
+    windDirection: degreesToCompass(c.winddirection_10m),
+    forecast,
+    lastUpdated: new Date().toISOString(),
+  };
+}
 
 /**
  * Map from settlementId → EventEmitter.
@@ -297,7 +448,8 @@ app.get('/', (_req, res) => {
     endpoints: {
       'GET /': 'API info (free)',
       'GET /api/free': 'Free endpoint',
-      'GET /api/weather': 'Weather data (0.001 USDC) — x402 protected',
+      'GET /api/weather':
+        'Live weather via Open-Meteo (0.001 USDC) — x402 protected. Params: ?city=London or ?lat=51.5&lon=-0.12',
       'GET /api/weather/settlement':
         'SSE stream for settlement status (?id=<settlementId>)',
       'GET /api/premium': 'Premium content ($0.01 USDC)',
@@ -340,10 +492,58 @@ app.get(
     const { payload } = req.payment;
     const settlementId = crypto.randomUUID();
 
+    // Resolve location: ?city=London  |  ?q=<any text>  |  ?lat=&lon=  |  default SF
+    const { city, q, lat, lon } = req.query as Record<
+      string,
+      string | undefined
+    >;
+    const locationQuery = city ?? q;
+
+    let weatherData: LiveWeatherData;
+    try {
+      if (locationQuery) {
+        const geo = await geocodeCity(locationQuery);
+        if (geo) {
+          weatherData = await fetchWeatherData(
+            geo.lat,
+            geo.lon,
+            `${geo.name}, ${geo.country}`
+          );
+        } else {
+          // Geocoding found nothing — fall back to San Francisco
+          weatherData = await fetchWeatherData(
+            37.7749,
+            -122.4194,
+            'San Francisco, CA'
+          );
+        }
+      } else if (lat && lon) {
+        weatherData = await fetchWeatherData(
+          parseFloat(lat),
+          parseFloat(lon),
+          `${lat}°, ${lon}°`
+        );
+      } else {
+        weatherData = await fetchWeatherData(
+          37.7749,
+          -122.4194,
+          'San Francisco, CA'
+        );
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('Weather fetch error:', msg);
+      res
+        .status(502)
+        .json({ error: 'Failed to fetch live weather data', details: msg });
+      return;
+    }
+
     res.json({
       success: true,
-      data: { ...weatherData, lastUpdated: new Date().toISOString() },
-      message: 'Weather data retrieved. Protected by x402 via Chainlink CRE.',
+      data: weatherData,
+      message:
+        'Live weather data retrieved. Protected by x402 via Chainlink CRE.',
       payer: payload.payload.authorization.from,
       settlementId,
     });

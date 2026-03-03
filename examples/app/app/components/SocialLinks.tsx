@@ -13,7 +13,7 @@ export function SocialLinks() {
         GITHUB
       </a>
       <a
-        href="https://docs.chain.link/chainlink-automation/concepts/automation-economics"
+        href="https://startup-dreamer.github.io/x402-chainlink/"
         target="_blank"
         rel="noopener noreferrer"
         className="social-link"

@@ -28,7 +28,8 @@ import {
 } from '@/lib/payment-client';
 
 // USDC on Base Sepolia — EIP-2612 permit domain info
-const USDC_BASE_SEPOLIA = '0x036CbD53842c5426634e7929541eC2318f3dCF7e' as `0x${string}`;
+const USDC_BASE_SEPOLIA =
+  '0x036CbD53842c5426634e7929541eC2318f3dCF7e' as `0x${string}`;
 const USDC_NAME = 'USDC';
 const USDC_VERSION = '2';
 
@@ -96,11 +97,14 @@ export default function WeatherClient() {
 
   // Clean up SSE on unmount
   useEffect(() => {
-    return () => { eventSourceRef.current?.close(); };
+    return () => {
+      eventSourceRef.current?.close();
+    };
   }, []);
 
-  const expressUrl =
-    (process.env.NEXT_PUBLIC_EXPRESS_URL ?? 'http://localhost:3001').replace(/\/$/, '');
+  const expressUrl = (
+    process.env.NEXT_PUBLIC_EXPRESS_URL ?? 'http://localhost:3001'
+  ).replace(/\/$/, '');
 
   const subscribeToSettlement = (settlementId: string) => {
     // Close any previous SSE connection
@@ -118,7 +122,9 @@ export default function WeatherClient() {
       try {
         const data = JSON.parse(evt.data) as { message?: string };
         setSettlementStatus(data.message ?? 'Settlement in progress...');
-      } catch { /* ignore parse errors */ }
+      } catch {
+        /* ignore parse errors */
+      }
     });
 
     es.addEventListener('settlement_complete', (evt) => {
@@ -127,7 +133,9 @@ export default function WeatherClient() {
         setSettlement(result);
         setSettlementStatus(null);
         setAgentStep('done');
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
       es.close();
       eventSourceRef.current = null;
     });
@@ -152,10 +160,14 @@ export default function WeatherClient() {
     setSettlementStatus(null);
     setPaymentInfo(null);
 
-    const privateKey = process.env.NEXT_PUBLIC_SENDER_PRIVATE_KEY as `0x${string}` | undefined;
+    const privateKey = process.env.NEXT_PUBLIC_SENDER_PRIVATE_KEY as
+      | `0x${string}`
+      | undefined;
 
     if (!privateKey) {
-      setError('NEXT_PUBLIC_SENDER_PRIVATE_KEY is not set. See .env.local.example');
+      setError(
+        'NEXT_PUBLIC_SENDER_PRIVATE_KEY is not set. See .env.local.example'
+      );
       setAgentStep('error');
       return;
     }
@@ -180,7 +192,9 @@ export default function WeatherClient() {
         PAYMENT_HEADERS.REQUIRED
       );
       if (!paymentRequiredHeader) {
-        throw new Error('Server returned 402 but missing PAYMENT-REQUIRED header');
+        throw new Error(
+          'Server returned 402 but missing PAYMENT-REQUIRED header'
+        );
       }
 
       const paymentRequired = decodePaymentRequired(paymentRequiredHeader);
@@ -213,7 +227,10 @@ export default function WeatherClient() {
         facilitatorAddress !== '0x0000000000000000000000000000000000000000'
       ) {
         try {
-          const publicClient = createPublicClient({ chain: baseSepolia, transport: http() });
+          const publicClient = createPublicClient({
+            chain: baseSepolia,
+            transport: http(),
+          });
           const nonce = await publicClient.readContract({
             address: USDC_BASE_SEPOLIA,
             abi: NONCES_ABI,
@@ -221,7 +238,8 @@ export default function WeatherClient() {
             args: [account.address],
           });
 
-          const permitDeadline = Math.floor(Date.now() / 1000) + requirements.maxTimeoutSeconds;
+          const permitDeadline =
+            Math.floor(Date.now() / 1000) + requirements.maxTimeoutSeconds;
           const permitData = await signPermit(
             walletClient,
             USDC_BASE_SEPOLIA,
@@ -231,7 +249,7 @@ export default function WeatherClient() {
             requirements.amount,
             84532,
             nonce,
-            permitDeadline,
+            permitDeadline
           );
 
           payload.payload.permit = permitData;
@@ -249,7 +267,9 @@ export default function WeatherClient() {
       });
 
       if (!paidResponse.ok) {
-        const errorBody = (await paidResponse.json().catch(() => ({}))) as { error?: string };
+        const errorBody = (await paidResponse.json().catch(() => ({}))) as {
+          error?: string;
+        };
         throw new Error(
           errorBody.error ??
             `Payment rejected: ${paidResponse.status} ${paidResponse.statusText}`
@@ -271,19 +291,21 @@ export default function WeatherClient() {
         setAgentStep('done');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch weather data');
+      setError(
+        err instanceof Error ? err.message : 'Failed to fetch weather data'
+      );
       setAgentStep('error');
     }
   };
 
   const stepLabel: Record<AgentStep, string> = {
-    idle:       'FETCH WEATHER DATA',
+    idle: 'FETCH WEATHER DATA',
     requesting: 'STEP 1/4: REQUESTING...',
-    signing:    'STEP 2/4: SIGNING EIP-712 + PERMIT...',
-    paying:     'STEP 3/4: SUBMITTING PAYMENT...',
-    settling:   'STEP 4/4: AWAITING SETTLEMENT...',
-    done:       'FETCH WEATHER DATA',
-    error:      'RETRY',
+    signing: 'STEP 2/4: SIGNING EIP-712 + PERMIT...',
+    paying: 'STEP 3/4: SUBMITTING PAYMENT...',
+    settling: 'STEP 4/4: AWAITING SETTLEMENT...',
+    done: 'FETCH WEATHER DATA',
+    error: 'RETRY',
   };
 
   const isLoading = !['idle', 'done', 'error'].includes(agentStep);
@@ -314,7 +336,11 @@ export default function WeatherClient() {
         </div>
       </div>
 
-      <button onClick={fetchWeather} disabled={isLoading} className="fetch-button">
+      <button
+        onClick={fetchWeather}
+        disabled={isLoading}
+        className="fetch-button"
+      >
         {isLoading ? (
           <span className="loading-text">
             <span className="spinner" />
@@ -328,16 +354,22 @@ export default function WeatherClient() {
       {/* Agent step tracker */}
       {isLoading && (
         <div className="agent-steps">
-          <div className={`step ${ ['requesting', 'signing', 'paying', 'settling'].includes(agentStep) ? 'active' : '' }`}>
+          <div
+            className={`step ${['requesting', 'signing', 'paying', 'settling'].includes(agentStep) ? 'active' : ''}`}
+          >
             1. Request endpoint
           </div>
-          <div className={`step ${ ['signing', 'paying', 'settling'].includes(agentStep) ? 'active' : '' }`}>
+          <div
+            className={`step ${['signing', 'paying', 'settling'].includes(agentStep) ? 'active' : ''}`}
+          >
             2. Sign EIP-712 + permit
           </div>
-          <div className={`step ${ ['paying', 'settling'].includes(agentStep) ? 'active' : '' }`}>
+          <div
+            className={`step ${['paying', 'settling'].includes(agentStep) ? 'active' : ''}`}
+          >
             3. Retry with signature
           </div>
-          <div className={`step ${ agentStep === 'settling' ? 'active' : '' }`}>
+          <div className={`step ${agentStep === 'settling' ? 'active' : ''}`}>
             4. Stream settlement via SSE
           </div>
         </div>
@@ -424,7 +456,9 @@ export default function WeatherClient() {
               </div>
               <div className="stat-line">
                 <span>WIND</span>
-                <span>{weather.windSpeed} MPH {weather.windDirection}</span>
+                <span>
+                  {weather.windSpeed} MPH {weather.windDirection}
+                </span>
               </div>
             </div>
           </div>
@@ -434,9 +468,15 @@ export default function WeatherClient() {
             <div className="forecast-grid">
               {weather.forecast.map((day) => (
                 <div key={day.day} className="forecast-item">
-                  <span className="day-name">{day.day.slice(0, 3).toUpperCase()}</span>
-                  <span className="day-cond">{day.condition.toUpperCase()}</span>
-                  <span className="day-temp">{day.high}° / {day.low}°</span>
+                  <span className="day-name">
+                    {day.day.slice(0, 3).toUpperCase()}
+                  </span>
+                  <span className="day-cond">
+                    {day.condition.toUpperCase()}
+                  </span>
+                  <span className="day-temp">
+                    {day.high}° / {day.low}°
+                  </span>
                 </div>
               ))}
             </div>

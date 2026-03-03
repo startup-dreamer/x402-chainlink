@@ -21,7 +21,11 @@ import {
   type PaymentRequired,
   type SettleResponse,
 } from 'x402-chainlink';
-import { getWeatherPaymentRequirements, EXPLORER_BASE_URL, NETWORK } from '@/lib/payment-config';
+import {
+  getWeatherPaymentRequirements,
+  EXPLORER_BASE_URL,
+  NETWORK,
+} from '@/lib/payment-config';
 
 // createProvider returns a PublicClient typed from x402-chainlink's viem — no type conflicts
 const publicClient = createProvider(NETWORK);
@@ -35,16 +39,18 @@ const weatherData = {
   windSpeed: 12,
   windDirection: 'NW',
   forecast: [
-    { day: 'Monday',    high: 70, low: 55, condition: 'Sunny' },
-    { day: 'Tuesday',   high: 68, low: 54, condition: 'Cloudy' },
+    { day: 'Monday', high: 70, low: 55, condition: 'Sunny' },
+    { day: 'Tuesday', high: 68, low: 54, condition: 'Cloudy' },
     { day: 'Wednesday', high: 72, low: 56, condition: 'Sunny' },
-    { day: 'Thursday',  high: 69, low: 53, condition: 'Partly Cloudy' },
-    { day: 'Friday',    high: 67, low: 52, condition: 'Rain' },
+    { day: 'Thursday', high: 69, low: 53, condition: 'Partly Cloudy' },
+    { day: 'Friday', high: 67, low: 52, condition: 'Rain' },
   ],
 };
 
 export async function GET(request: NextRequest) {
-  const paymentSignatureHeader = request.headers.get(HTTP_HEADERS.PAYMENT_SIGNATURE);
+  const paymentSignatureHeader = request.headers.get(
+    HTTP_HEADERS.PAYMENT_SIGNATURE
+  );
 
   // ── Step 1: No payment header → return 402 ─────────────────────────────
   if (!paymentSignatureHeader) {
@@ -66,7 +72,8 @@ export async function GET(request: NextRequest) {
       {
         status: 402,
         headers: {
-          [HTTP_HEADERS.PAYMENT_REQUIRED]: encodePaymentRequired(paymentRequired),
+          [HTTP_HEADERS.PAYMENT_REQUIRED]:
+            encodePaymentRequired(paymentRequired),
         },
       }
     );
@@ -79,7 +86,10 @@ export async function GET(request: NextRequest) {
   try {
     payload = decodePaymentSignature(paymentSignatureHeader);
   } catch {
-    return NextResponse.json({ error: 'Invalid payment signature encoding' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Invalid payment signature encoding' },
+      { status: 400 }
+    );
   }
 
   const verification = await verifyPayment(publicClient, payload, requirements);
@@ -104,14 +114,17 @@ export async function GET(request: NextRequest) {
       {
         status: 402,
         headers: {
-          [HTTP_HEADERS.PAYMENT_REQUIRED]: encodePaymentRequired(paymentRequired),
+          [HTTP_HEADERS.PAYMENT_REQUIRED]:
+            encodePaymentRequired(paymentRequired),
         },
       }
     );
   }
 
   if (permitBypassesAllowance) {
-    console.log('[x402] Allowance insufficient but EIP-2612 permit present — proceeding with permit-based settlement');
+    console.log(
+      '[x402] Allowance insufficient but EIP-2612 permit present — proceeding with permit-based settlement'
+    );
   }
 
   // ── Step 3: Return weather data immediately ─────────────────────────────
@@ -124,7 +137,8 @@ export async function GET(request: NextRequest) {
 
   // ── Step 4: Settle in background (non-blocking) ─────────────────────────
   const broadcastEnabled = process.env.CRE_BROADCAST === 'true';
-  const workflowPath = process.env.WORKFLOW_PATH ?? '../x402-chainlink/x402-workflow';
+  const workflowPath =
+    process.env.WORKFLOW_PATH ?? '../x402-chainlink/x402-workflow';
   const targetSettings = process.env.CRE_TARGET ?? 'staging-settings';
   const facilitatorAddress = (process.env.FACILITATOR_ADDRESS ??
     '0x0000000000000000000000000000000000000000') as `0x${string}`;
@@ -132,32 +146,42 @@ export async function GET(request: NextRequest) {
   let settlementResult: SettleResponse | null = null;
 
   try {
-    settlementResult = await settlePayment(publicClient, payload, requirements, {
-      simulation: true,
-      skipVerification: true,
-      creConfig: {
-        endpoint: 'cli://simulation',
-        network: requirements.network,
-        facilitatorAddress,
+    settlementResult = await settlePayment(
+      publicClient,
+      payload,
+      requirements,
+      {
         simulation: true,
-        workflowPath,
-        targetSettings,
-        broadcastInSimulation: broadcastEnabled,
-        timeout: 60000,
-      },
-    });
+        skipVerification: true,
+        creConfig: {
+          endpoint: 'cli://simulation',
+          network: requirements.network,
+          facilitatorAddress,
+          simulation: true,
+          workflowPath,
+          targetSettings,
+          broadcastInSimulation: broadcastEnabled,
+          timeout: 60000,
+        },
+      }
+    );
 
     if (settlementResult.success) {
       console.log(
         `[x402] Settlement successful: ${settlementResult.transaction}` +
-          (broadcastEnabled ? ` | ${EXPLORER_BASE_URL}/tx/${settlementResult.transaction}` : '')
+          (broadcastEnabled
+            ? ` | ${EXPLORER_BASE_URL}/tx/${settlementResult.transaction}`
+            : '')
       );
     } else {
       console.warn(`[x402] Settlement failed: ${settlementResult.errorReason}`);
     }
   } catch (err) {
     // CRE CLI may not be installed — log and continue, don't block the response
-    console.warn('[x402] Settlement skipped (CRE CLI unavailable):', (err as Error).message);
+    console.warn(
+      '[x402] Settlement skipped (CRE CLI unavailable):',
+      (err as Error).message
+    );
     settlementResult = {
       success: false,
       errorReason: 'cre_cli_unavailable',
@@ -177,7 +201,8 @@ export async function GET(request: NextRequest) {
   return NextResponse.json(responseData, {
     status: 200,
     headers: {
-      [HTTP_HEADERS.PAYMENT_RESPONSE]: encodePaymentResponse(settlementResponse),
+      [HTTP_HEADERS.PAYMENT_RESPONSE]:
+        encodePaymentResponse(settlementResponse),
     },
   });
 }

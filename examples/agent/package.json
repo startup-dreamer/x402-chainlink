@@ -1,0 +1,20 @@
+{
+  "name": "x402-chainlink-weather-agent",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Gemini AI agent with x402 payment flow — asks Gemini, pays for weather data via Chainlink CRE on Base Sepolia",
+  "scripts": {
+    "start": "node --import tsx agent.ts",
+    "dev": "node --import tsx --watch agent.ts"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.0",
+    "dotenv": "^16.4.5",
+    "viem": "^2.21.54"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}
