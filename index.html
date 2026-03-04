@@ -1,579 +1,240 @@
-<!DOCTYPE html><html class="default" lang="en" data-base="./"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>x402-chainlink</title><meta name="description" content="Documentation for x402-chainlink"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script defer src="assets/main.js"></script><script async src="assets/icons.js" id="tsd-icons-script"></script><script async src="assets/search.js" id="tsd-search-script"></script><script async src="assets/navigation.js" id="tsd-nav-script"></script><script async src="assets/hierarchy.js" id="tsd-hierarchy-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><a href="index.html" class="title">x402-chainlink</a><div id="tsd-toolbar-links"></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/><ul role="listbox" id="tsd-search-results"></ul><div id="tsd-search-status" aria-live="polite" aria-atomic="true"><div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-menu"></use></svg></a></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><h1>x402-chainlink</h1></div><div class="tsd-panel tsd-typography"><h1 id="x402-chainlink" class="tsd-anchor-link">x402-chainlink<a href="#x402-chainlink" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1>
-<p><strong>HTTP 402 Payment Protocol powered by Chainlink Runtime Environment</strong></p>
-<p>Pay-per-use API monetization with cryptographic payment proofs and decentralized settlement.</p>
-<pre><code class="typescript"><span class="hl-0">// Server</span><br/><span class="hl-1">app</span><span class="hl-2">.</span><span class="hl-3">get</span><span class="hl-2">(</span><span class="hl-4">&#39;/premium-data&#39;</span><span class="hl-2">, </span><span class="hl-5">async</span><span class="hl-2"> (</span><span class="hl-1">req</span><span class="hl-2">, </span><span class="hl-1">res</span><span class="hl-2">) </span><span class="hl-5">=&gt;</span><span class="hl-2"> {</span><br/><span class="hl-2">  </span><span class="hl-6">if</span><span class="hl-2"> (!</span><span class="hl-1">req</span><span class="hl-2">.</span><span class="hl-1">headers</span><span class="hl-2">[</span><span class="hl-4">&#39;x-payment-response&#39;</span><span class="hl-2">]) {</span><br/><span class="hl-2">    </span><span class="hl-6">return</span><span class="hl-2"> </span><span class="hl-1">res</span><span class="hl-2">.</span><span class="hl-3">status</span><span class="hl-2">(</span><span class="hl-7">402</span><span class="hl-2">).</span><span class="hl-3">json</span><span class="hl-2">({ </span><span class="hl-1">accepts:</span><span class="hl-2"> [</span><span class="hl-1">requirements</span><span class="hl-2">] });</span><br/><span class="hl-2">  }</span><br/><span class="hl-2">  </span><span class="hl-0">// Verify &amp; settle via Chainlink CRE</span><br/><span class="hl-2">  </span><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-8">verified</span><span class="hl-2"> = </span><span class="hl-6">await</span><span class="hl-2"> </span><span class="hl-3">verifyPayment</span><span class="hl-2">(</span><span class="hl-1">payload</span><span class="hl-2">);</span><br/><span class="hl-2">  </span><span class="hl-6">if</span><span class="hl-2"> (</span><span class="hl-1">verified</span><span class="hl-2">.</span><span class="hl-1">isValid</span><span class="hl-2">) {</span><br/><span class="hl-2">    </span><span class="hl-6">return</span><span class="hl-2"> </span><span class="hl-1">res</span><span class="hl-2">.</span><span class="hl-3">json</span><span class="hl-2">({ </span><span class="hl-1">data:</span><span class="hl-2"> </span><span class="hl-1">premiumData</span><span class="hl-2"> });</span><br/><span class="hl-2">  }</span><br/><span class="hl-2">});</span><br/><br/><span class="hl-0">// Client</span><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-8">payload</span><span class="hl-2"> = </span><span class="hl-6">await</span><span class="hl-2"> </span><span class="hl-3">createPaymentPayload</span><span class="hl-2">(</span><span class="hl-1">wallet</span><span class="hl-2">, </span><span class="hl-1">requirements</span><span class="hl-2">);</span><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-8">response</span><span class="hl-2"> = </span><span class="hl-6">await</span><span class="hl-2"> </span><span class="hl-3">fetch</span><span class="hl-2">(</span><span class="hl-1">url</span><span class="hl-2">, {</span><br/><span class="hl-2">  </span><span class="hl-1">headers:</span><span class="hl-2"> { </span><span class="hl-4">&#39;X-Payment-Response&#39;</span><span class="hl-1">:</span><span class="hl-2"> </span><span class="hl-1">payload</span><span class="hl-2"> },</span><br/><span class="hl-2">});</span>
-</code><button type="button">Copy</button></pre>
-
-<hr>
-<h2 id="table-of-contents" class="tsd-anchor-link">Table of Contents<a href="#table-of-contents" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<!DOCTYPE html><html class="default" lang="en" data-base="./"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>x402-chainlink</title><meta name="description" content="Documentation for x402-chainlink"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script defer src="assets/main.js"></script><script async src="assets/icons.js" id="tsd-icons-script"></script><script async src="assets/search.js" id="tsd-search-script"></script><script async src="assets/navigation.js" id="tsd-nav-script"></script><script async src="assets/hierarchy.js" id="tsd-hierarchy-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><a href="index.html" class="title">x402-chainlink</a><div id="tsd-toolbar-links"></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/><ul role="listbox" id="tsd-search-results"></ul><div id="tsd-search-status" aria-live="polite" aria-atomic="true"><div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-menu"></use></svg></a></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><h1>x402-chainlink</h1></div><div class="tsd-panel tsd-typography"><div style="text-align:center" align="center">
+    <a href="https://chain.link" target="_blank">
+        <img src="https://raw.githubusercontent.com/smartcontractkit/chainlink/develop/docs/logo-chainlink-blue.svg" width="225" alt="Chainlink logo">
+    </a>
+<p><img src="https://img.shields.io/npm/dt/x402-chainlink?style=flat&amp;label=npm%20downloads&amp;color=green" alt="npm downloads">
+<a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/license-Apache%202.0-blue" alt="License"></a>
+<a href="https://docs.chain.link/cre"><img src="https://img.shields.io/static/v1?label=cre-docs&amp;message=latest&amp;color=yellow" alt="Chainlink Runtime Environment Documentation"></a>
+<a href="https://startup-dreamer.github.io/x402-chainlink/"><img src="https://img.shields.io/static/v1?label=sdk-docs&amp;message=latest&amp;color=yellow" alt="sdk-docs"></a></p>
+</div>
+<h1 id="x402-chainlink" class="tsd-anchor-link">x402-chainlink<a href="#x402-chainlink" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1>
+<h2 id="overview" class="tsd-anchor-link">Overview<a href="#overview" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>Push Engine is a service that bridges off-chain data streams with on-chain smart contracts. It continuously monitors off-chain price updates and pushes them on-chain based on predefined conditions such as price deviations or time intervals.</p>
+<h3 id="key-features" class="tsd-anchor-link">Key Features:<a href="#key-features" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul>
-<li><a href="#-quick-start">Quick Start</a></li>
-<li><a href="#-production-deployment">Production Deployment</a>
+<li>Retrieves and verifies price data from Chainlink Data Streams.</li>
+<li>Writes verified prices to on-chain smart contracts.</li>
+<li>Supports containerized deployment with Docker.</li>
+<li>Configurable through environment variables and Redis-based settings.</li>
+</ul>
+<hr>
+<h2 id="table-of-contents" class="tsd-anchor-link">Table of contents<a href="#table-of-contents" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<ul>
+<li><a href="#push-engine">Push Engine</a>
+<ul>
+<li><a href="#overview">Overview</a>
+<ul>
+<li><a href="#key-features">Key Features:</a></li>
+</ul>
+</li>
+<li><a href="#table-of-contents">Table of contents</a></li>
+<li><a href="#system-architecture-overview">System Architecture Overview</a></li>
+<li><a href="#installation-instructions">Installation Instructions</a>
 <ul>
 <li><a href="#prerequisites">Prerequisites</a></li>
-<li><a href="#step-1-deploy-x402facilitator-contract">Step 1: Deploy X402Facilitator Contract</a></li>
-<li><a href="#step-2-deploy-cre-workflow">Step 2: Deploy CRE Workflow</a></li>
-<li><a href="#step-3-configure-and-test">Step 3: Configure and Test</a></li>
+<li><a href="#installation-steps">Installation Steps</a></li>
 </ul>
 </li>
-<li><a href="#-zero-setup-payments-eip-2612-permit">Zero-Setup Payments (EIP-2612 Permit)</a></li>
-<li><a href="#-architecture">Architecture</a></li>
-<li><a href="#-api-overview">API Reference</a></li>
-<li><a href="#-security">Security</a></li>
-<li><a href="#-supported-networks">Supported Networks</a></li>
+<li><a href="#environment-variables">Environment Variables</a></li>
+<li><a href="#yaml-configuration-setup">YAML Configuration Setup</a>
+<ul>
+<li><a href="#yaml-configuration">YAML Configuration</a></li>
+<li><a href="#example-yaml-configuration">Example YAML Configuration</a></li>
+<li><a href="#key-configuration-parameters">Key Configuration Parameters</a></li>
 </ul>
+</li>
+<li><a href="#deployment-guide">Deployment Guide</a>
+<ul>
+<li><a href="#running-with-docker-compose">Running with Docker Compose</a></li>
+<li><a href="#production-deployment">Production Deployment</a></li>
+</ul>
+</li>
+<li><a href="#websocket-reconnect-logic">WebSocket Reconnect Logic</a>
+<ul>
+<li><a href="#how-it-works">How it works</a></li>
+<li><a href="#when-reconnect-happens">When Reconnect Happens</a></li>
+<li><a href="#reconnect-configuration">Reconnect Configuration</a></li>
+<li><a href="#retry-logic">Retry Logic</a></li>
+</ul>
+</li>
+<li><a href="#infrastructural-considerations">Infrastructural Considerations</a></li>
+<li><a href="#ui">UI</a>
+<ul>
+<li><a href="#ui-setup-instructions">UI Setup Instructions</a></li>
+<li><a href="#ui-usage">UI usage</a>
+<ul>
+<li><a href="#streams">Streams</a>
+<ul>
+<li><a href="#contract">Contract</a>
+<ul>
+<li><a href="#evm-contract">EVM Contract</a></li>
+<li><a href="#svm-program">SVM Program</a></li>
+</ul>
+</li>
+<li><a href="#add-new-data-stream">Add new data stream</a></li>
+</ul>
+</li>
+<li><a href="#chain">Chain</a>
+<ul>
+<li><a href="#switch-chain">Switch chain</a></li>
+<li><a href="#add-new-chain">Add new chain</a></li>
+</ul>
+</li>
+<li><a href="#schedule">Schedule</a>
+<ul>
+<li><a href="#set-new-schedule-pattern">Set new schedule pattern</a></li>
+</ul>
+</li>
+<li><a href="#verifier-contracts">Verifier Contracts</a>
+<ul>
+<li><a href="#set-verifier-contracts">Set Verifier Contracts</a></li>
+</ul>
+</li>
+<li><a href="#price-delta-percentage">Price delta percentage</a></li>
+<li><a href="#gas-cap">Gas cap</a></li>
+<li><a href="#logs">Logs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#logging">Logging</a></li>
+<li><a href="#testing-commands">Testing Commands</a></li>
+<li><a href="#notes">Notes</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a>
+<ul>
+<li><a href="#common-issues--fixes">Common Issues &amp; Fixes</a></li>
+</ul>
+</li>
+<li><a href="#modifications--further-development">Modifications &amp; Further Development</a>
+<ul>
+<li><a href="#modifications">Modifications</a></li>
+</ul>
+</li>
+<li><a href="#styling">Styling</a></li>
+<li><a href="#license">License</a></li>
+<li><a href="#resources">Resources</a></li>
+</ul>
+</li>
+</ul>
+<h1 id="🌐-x402-chainlink-sdk-the-web3-stripe-powered-by-cre" class="tsd-anchor-link">🌐 x402-Chainlink SDK: The Web3 Stripe Powered by CRE<a href="#🌐-x402-chainlink-sdk-the-web3-stripe-powered-by-cre" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1>
+<p>x402-Chainlink is a robust, developer-friendly SDK that brings a &quot;Stripe-like&quot; seamless payment experience to Web3. By leveraging the <strong>x402 Protocol</strong> (an evolution of the HTTP 402 Payment Required standard) and the <strong>Chainlink Runtime Environment (CRE)</strong>, this project enables developers to instantly monetize APIs, content, and services with decentralized, chain-agnostic micro-payments.</p>
+<p>If you can use a standard REST API, you can now monetize it with crypto in less than 10 lines of code.</p>
 <hr>
-<h2 id="quick-start" class="tsd-anchor-link">Quick Start<a href="#quick-start" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
-<h3 id="installation" class="tsd-anchor-link">Installation<a href="#installation" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<pre><code class="bash"><span class="hl-3">npm</span><span class="hl-2"> </span><span class="hl-4">install</span><span class="hl-2"> </span><span class="hl-4">x402-chainlink</span><span class="hl-2"> </span><span class="hl-4">viem</span>
-</code><button type="button">Copy</button></pre>
-
-<h3 id="run-examples" class="tsd-anchor-link">Run Examples<a href="#run-examples" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<pre><code class="bash"><span class="hl-0"># Full simulation test (no real funds needed)</span><br/><span class="hl-3">bun</span><span class="hl-2"> </span><span class="hl-4">scripts/manual-test-simulation.ts</span><br/><br/><span class="hl-0"># HTTP integration test</span><br/><span class="hl-3">bun</span><span class="hl-2"> </span><span class="hl-4">scripts/test-express-server.ts</span>
-</code><button type="button">Copy</button></pre>
-
-<hr>
-<h2 id="production-deployment" class="tsd-anchor-link">Production Deployment<a href="#production-deployment" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
-<p>This section covers deploying x402-chainlink to production using Chainlink Runtime Environment (CRE).</p>
-<h3 id="prerequisites" class="tsd-anchor-link">Prerequisites<a href="#prerequisites" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<h2 id="💡-the-vision-decentralizing-the-payment-processor" class="tsd-anchor-link">💡 The Vision: Decentralizing the Payment Processor<a href="#💡-the-vision-decentralizing-the-payment-processor" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>Centralized payment processors like Stripe revolutionized Web2 by abstracting away the complexity of fiat banking. However, Web3 payments remain fragmented, requiring users to sign complex transactions, manage multiple wallets, and deal with network-specific RPCs just to access a simple paid API or premium article.</p>
+<p><strong>x402-Chainlink solves this.</strong> Instead of a centralized processor acting as the middleman, we use <strong>Chainlink CRE</strong> as a verifiable, decentralized backend. The x402 protocol handles the HTTP-level negotiation, allowing servers to demand payment and clients to automatically fulfill it via smart contracts, returning a cryptographically secure token (like a Macaroon) to access the resource.</p>
+<h3 id="🎯-key-use-cases" class="tsd-anchor-link">🎯 Key Use Cases<a href="#🎯-key-use-cases" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ol>
-<li><strong>Install required tools:</strong></li>
+<li><strong>API Monetization (Machine-to-Machine):</strong> Charge per API call without requiring users to buy subscriptions. Perfect for AI models, oracle data feeds, or heavy compute tasks.</li>
+<li><strong>Decentralized Paywalls:</strong> Monetize premium content, articles, or digital media natively via user wallets.</li>
+<li><strong>Frictionless Token-Gating:</strong> Verify NFT or token holdings directly at the HTTP layer before serving content.</li>
+<li><strong>Automated Micro-transactions:</strong> Enable streaming payments for continuous services (e.g., video streaming, cloud storage).</li>
 </ol>
-<pre><code class="bash"><span class="hl-0"># Install CRE CLI</span><br/><span class="hl-3">curl</span><span class="hl-2"> </span><span class="hl-5">-sSL</span><span class="hl-2"> </span><span class="hl-4">https://cre.chain.link/install.sh</span><span class="hl-2"> | </span><span class="hl-3">bash</span><br/><br/><span class="hl-0"># Install Foundry (for contract deployment)</span><br/><span class="hl-3">curl</span><span class="hl-2"> </span><span class="hl-5">-L</span><span class="hl-2"> </span><span class="hl-4">https://foundry.paradigm.xyz</span><span class="hl-2"> | </span><span class="hl-3">bash</span><br/><span class="hl-3">foundryup</span><br/><br/><span class="hl-0"># Install Bun (for TypeScript)</span><br/><span class="hl-3">curl</span><span class="hl-2"> </span><span class="hl-5">-fsSL</span><span class="hl-2"> </span><span class="hl-4">https://bun.sh/install</span><span class="hl-2"> | </span><span class="hl-3">bash</span>
+<hr>
+<h2 id="🏗️-architecture-protocol-flow" class="tsd-anchor-link">🏗️ Architecture &amp; Protocol Flow<a href="#🏗️-architecture-protocol-flow" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>The SDK abstracts the entire x402 negotiation and on-chain settlement process. Under the hood, Chainlink CRE acts as the secure, decentralized verifier that confirms the payment on-chain and signs the authorization token.</p>
+<h3 id="system-architecture" class="tsd-anchor-link">System Architecture<a href="#system-architecture" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<pre><code class="mermaid">graph TD
+    subgraph Client Application
+        C[Client / Browser]
+        S[x402 SDK Client]
+    end
+
+    subgraph Server Infrastructure
+        API[Your REST API]
+        M[x402 Middleware]
+    end
+
+    subgraph Decentralized Verification
+        CRE[Chainlink Runtime Environment]
+        SC[Smart Contracts / EVM]
+    end
+
+    C <-->|1. HTTP Request| API
+    API <-->|2. Returns 402 + Invoice| M
+    S -->|3. Initiates Payment| SC
+    CRE -->|4. Observes & Verifies| SC
+    CRE -->|5. Issues Pre-image/Proof| S
+    S -->|6. Retry Request + Proof| API
+
+</code><button type="button">Copy</button></pre>
+
+<h3 id="the-x402-negotiation-sequence" class="tsd-anchor-link">The x402 Negotiation Sequence<a href="#the-x402-negotiation-sequence" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<pre><code class="mermaid">sequenceDiagram
+    autonumber
+    participant User as Client (x402 SDK)
+    participant Server as Resource Server
+    participant CRE as Chainlink CRE
+    participant Blockchain as Smart Contract
+
+    User->>Server: GET /api/premium-data
+    Server-->>User: HTTP 402 Payment Required <br/> (Headers: Payment-Req, Network, Amount)
+    
+    Note over User,Blockchain: Payment Phase
+    User->>Blockchain: Transfer Funds (ERC20 / Native)
+    
+    Note over CRE,Blockchain: Verification Phase
+    CRE->>Blockchain: Listen for payment event
+    Blockchain-->>CRE: Event Confirmed
+    CRE->>CRE: Generate cryptographic proof (Macaroon/Signature)
+    CRE-->>User: Return Proof
+    
+    Note over User,Server: Fulfillment Phase
+    User->>Server: GET /api/premium-data <br/> (Header: Authorization: L402 <Proof>)
+    Server->>Server: Validate Proof (Local or via CRE)
+    Server-->>User: HTTP 200 OK (Delivers Data)
+
+</code><button type="button">Copy</button></pre>
+
+<hr>
+<h2 id="🚀-built-for-the-masses-sdk-usage" class="tsd-anchor-link">🚀 Built for the Masses: SDK Usage<a href="#🚀-built-for-the-masses-sdk-usage" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>We built this SDK to be as intuitive as Web2 payment gateways. You don't need to be a blockchain expert to use it.</p>
+<h3 id="1-server-side-protecting-an-endpoint" class="tsd-anchor-link">1. Server-Side: Protecting an Endpoint<a href="#1-server-side-protecting-an-endpoint" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>Wrap your existing Express, Next.js, or standard Node.js endpoints with our middleware.</p>
+<pre><code class="typescript"><span class="hl-0">import</span><span class="hl-1"> </span><span class="hl-2">express</span><span class="hl-1"> </span><span class="hl-0">from</span><span class="hl-1"> </span><span class="hl-3">&#39;express&#39;</span><span class="hl-1">;</span><br/><span class="hl-0">import</span><span class="hl-1"> { </span><span class="hl-2">x402Middleware</span><span class="hl-1"> } </span><span class="hl-0">from</span><span class="hl-1"> </span><span class="hl-3">&#39;x402-chainlink/server&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-5">app</span><span class="hl-1"> = </span><span class="hl-6">express</span><span class="hl-1">();</span><br/><br/><span class="hl-7">// Initialize the middleware with your Chainlink CRE config</span><br/><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-5">requirePayment</span><span class="hl-1"> = </span><span class="hl-6">x402Middleware</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-2">creEndpoint:</span><span class="hl-1"> </span><span class="hl-2">process</span><span class="hl-1">.</span><span class="hl-2">env</span><span class="hl-1">.</span><span class="hl-5">CRE_ENDPOINT</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-2">acceptedTokens:</span><span class="hl-1"> [</span><span class="hl-3">&#39;USDC&#39;</span><span class="hl-1">, </span><span class="hl-3">&#39;LINK&#39;</span><span class="hl-1">],</span><br/><span class="hl-1">  </span><span class="hl-2">price:</span><span class="hl-1"> </span><span class="hl-8">0.50</span><span class="hl-1">, </span><span class="hl-7">// USD</span><br/><span class="hl-1">  </span><span class="hl-2">network:</span><span class="hl-1"> </span><span class="hl-3">&#39;any-evm&#39;</span><span class="hl-1"> </span><span class="hl-7">// Chain-agnostic via Chainlink CCIP/CRE</span><br/><span class="hl-1">});</span><br/><br/><span class="hl-7">// Protect the route</span><br/><span class="hl-2">app</span><span class="hl-1">.</span><span class="hl-6">get</span><span class="hl-1">(</span><span class="hl-3">&#39;/api/generate-ai-image&#39;</span><span class="hl-1">, </span><span class="hl-2">requirePayment</span><span class="hl-1">, (</span><span class="hl-2">req</span><span class="hl-1">, </span><span class="hl-2">res</span><span class="hl-1">) </span><span class="hl-4">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-2">res</span><span class="hl-1">.</span><span class="hl-6">json</span><span class="hl-1">({ </span><span class="hl-2">image:</span><span class="hl-1"> </span><span class="hl-3">&quot;https://...&quot;</span><span class="hl-1">, </span><span class="hl-2">message:</span><span class="hl-1"> </span><span class="hl-3">&quot;Payment successful via CRE!&quot;</span><span class="hl-1"> });</span><br/><span class="hl-1">});</span><br/><br/><span class="hl-2">app</span><span class="hl-1">.</span><span class="hl-6">listen</span><span class="hl-1">(</span><span class="hl-8">3000</span><span class="hl-1">);</span><br/>
+</code><button type="button">Copy</button></pre>
+
+<h3 id="2-client-side-consuming-a-paid-endpoint" class="tsd-anchor-link">2. Client-Side: Consuming a Paid Endpoint<a href="#2-client-side-consuming-a-paid-endpoint" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>The client SDK intercepts <code>402 Payment Required</code> responses, automatically prompts the user's wallet for payment, retrieves the proof from the Chainlink CRE, and retries the request seamlessly.</p>
+<pre><code class="typescript"><span class="hl-0">import</span><span class="hl-1"> { </span><span class="hl-2">X402Client</span><span class="hl-1"> } </span><span class="hl-0">from</span><span class="hl-1"> </span><span class="hl-3">&#39;x402-chainlink/client&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-7">// Initialize the client (hooks into Ethers.js, Viem, or Solana Web3)</span><br/><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-5">client</span><span class="hl-1"> = </span><span class="hl-4">new</span><span class="hl-1"> </span><span class="hl-6">X402Client</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-2">provider:</span><span class="hl-1"> </span><span class="hl-2">window</span><span class="hl-1">.</span><span class="hl-2">ethereum</span><span class="hl-1">, </span><br/><span class="hl-1">  </span><span class="hl-2">autoPay:</span><span class="hl-1"> </span><span class="hl-4">true</span><span class="hl-1">, </span><span class="hl-7">// Automatically handle micro-transactions below a certain threshold</span><br/><span class="hl-1">  </span><span class="hl-2">maxAutoPayThreshold:</span><span class="hl-1"> </span><span class="hl-8">5.00</span><span class="hl-1"> </span><br/><span class="hl-1">});</span><br/><br/><span class="hl-4">async</span><span class="hl-1"> </span><span class="hl-4">function</span><span class="hl-1"> </span><span class="hl-6">fetchPremiumData</span><span class="hl-1">() {</span><br/><span class="hl-1">  </span><span class="hl-0">try</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-7">// The client handles the entire 402 negotiation under the hood</span><br/><span class="hl-1">    </span><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-5">response</span><span class="hl-1"> = </span><span class="hl-0">await</span><span class="hl-1"> </span><span class="hl-2">client</span><span class="hl-1">.</span><span class="hl-6">fetch</span><span class="hl-1">(</span><span class="hl-3">&#39;https://api.yoursite.com/api/generate-ai-image&#39;</span><span class="hl-1">);</span><br/><span class="hl-1">    </span><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-5">data</span><span class="hl-1"> = </span><span class="hl-0">await</span><span class="hl-1"> </span><span class="hl-2">response</span><span class="hl-1">.</span><span class="hl-6">json</span><span class="hl-1">();</span><br/><span class="hl-1">    </span><span class="hl-2">console</span><span class="hl-1">.</span><span class="hl-6">log</span><span class="hl-1">(</span><span class="hl-2">data</span><span class="hl-1">);</span><br/><span class="hl-1">  } </span><span class="hl-0">catch</span><span class="hl-1"> (</span><span class="hl-2">error</span><span class="hl-1">) {</span><br/><span class="hl-1">    </span><span class="hl-2">console</span><span class="hl-1">.</span><span class="hl-6">error</span><span class="hl-1">(</span><span class="hl-3">&quot;Payment failed or request aborted&quot;</span><span class="hl-1">, </span><span class="hl-2">error</span><span class="hl-1">);</span><br/><span class="hl-1">  }</span><br/><span class="hl-1">}</span><br/>
+</code><button type="button">Copy</button></pre>
+
+<hr>
+<h2 id="🛠️-why-chainlink-cre" class="tsd-anchor-link">🛠️ Why Chainlink CRE?<a href="#🛠️-why-chainlink-cre" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>The core innovation of this project lies in moving the heavy lifting of payment verification off the primary application server and into the <strong>Chainlink Runtime Environment</strong>.</p>
+<ul>
+<li><strong>Absolute Trust:</strong> The server doesn't need to trust the client, and the client doesn't need to trust the server. The CRE acts as the decentralized, unbiased referee that verifies the on-chain settlement and issues the access credential.</li>
+<li><strong>Chain Agnosticism:</strong> Because CRE can observe multiple networks, your API can accept payments on Polygon, Base, Ethereum, or Arbitrum simultaneously without you having to run local RPC nodes for each.</li>
+<li><strong>Low Latency:</strong> CRE workflows execute securely and rapidly off-chain, ensuring the HTTP request-response cycle remains fast enough for modern web applications.</li>
+</ul>
+<h2 id="🏁-running-locally" class="tsd-anchor-link">🏁 Running Locally<a href="#🏁-running-locally" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<ol>
+<li><strong>Clone &amp; Install:</strong></li>
+</ol>
+<pre><code class="bash"><span class="hl-6">git</span><span class="hl-1"> </span><span class="hl-3">clone</span><span class="hl-1"> </span><span class="hl-3">https://github.com/your-org/x402-chainlink.git</span><br/><span class="hl-6">cd</span><span class="hl-1"> </span><span class="hl-3">x402-chainlink</span><br/><span class="hl-6">npm</span><span class="hl-1"> </span><span class="hl-3">install</span><br/>
 </code><button type="button">Copy</button></pre>
 
 <ol start="2">
-<li>
-<p><strong>Create CRE account:</strong></p>
-<ul>
-<li>Visit <a href="https://cre.chain.link">https://cre.chain.link</a></li>
-<li>Create account and link wallet</li>
-<li>Note your workflow owner address</li>
-</ul>
-</li>
-<li>
-<p><strong>Get testnet tokens:</strong></p>
-<ul>
-<li>Base Sepolia ETH: <a href="https://faucet.quicknode.com/base/sepolia">https://faucet.quicknode.com/base/sepolia</a></li>
-<li>USDC on Base Sepolia: (mint test tokens or use faucet)</li>
-</ul>
-</li>
-<li>
-<p><strong>Configure environment:</strong></p>
-</li>
+<li><strong>Configure Environment:</strong>
+Copy <code>.env.example</code> to <code>.env</code> and add your Chainlink CRE credentials and target RPC URLs.</li>
+<li><strong>Deploy the Verifier Contract:</strong></li>
 </ol>
-<pre><code class="bash"><span class="hl-0"># Copy example environment file</span><br/><span class="hl-3">cp</span><span class="hl-2"> </span><span class="hl-4">.env.example</span><span class="hl-2"> </span><span class="hl-4">.env</span><br/><br/><span class="hl-0"># Edit .env and fill in:</span><br/><span class="hl-0"># - DEPLOYER_PRIVATE_KEY</span><br/><span class="hl-0"># - CRE_WORKFLOW_OWNER_ADDRESS</span><br/><span class="hl-0"># - API keys (optional, for premium RPCs)</span>
+<pre><code class="bash"><span class="hl-6">npm</span><span class="hl-1"> </span><span class="hl-3">run</span><span class="hl-1"> </span><span class="hl-3">deploy:contracts</span><br/>
 </code><button type="button">Copy</button></pre>
 
-<h3 id="step-1-deploy-x402facilitator-contract" class="tsd-anchor-link">Step 1: Deploy X402Facilitator Contract<a href="#step-1-deploy-x402facilitator-contract" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<p>The X402Facilitator contract handles on-chain settlement. It receives signed reports from KeystoneForwarder and executes token transfers.</p>
-<pre><code class="bash"><span class="hl-0"># Install Foundry dependencies</span><br/><span class="hl-3">forge</span><span class="hl-2"> </span><span class="hl-4">install</span><br/><br/><span class="hl-0"># Deploy to Base Sepolia (simulation mode with MockForwarder)</span><br/><span class="hl-3">forge</span><span class="hl-2"> </span><span class="hl-4">script</span><span class="hl-2"> </span><span class="hl-4">scripts/foundry/DeployX402Facilitator.s.sol:DeployX402Facilitator</span><span class="hl-2"> </span><span class="hl-9">\</span><br/><span class="hl-2">  </span><span class="hl-5">--rpc-url</span><span class="hl-2"> </span><span class="hl-4">base_sepolia</span><span class="hl-2"> </span><span class="hl-9">\</span><br/><span class="hl-2">  </span><span class="hl-5">--broadcast</span><span class="hl-2"> </span><span class="hl-9">\</span><br/><span class="hl-2">  </span><span class="hl-5">--verify</span><span class="hl-2"> </span><span class="hl-9">\</span><br/><span class="hl-2">  </span><span class="hl-5">-vvvv</span><br/><br/><span class="hl-0"># For production (KeystoneForwarder), add USE_KEYSTONE=true</span><br/><span class="hl-1">USE_KEYSTONE</span><span class="hl-2">=</span><span class="hl-4">true</span><span class="hl-2"> </span><span class="hl-3">forge</span><span class="hl-2"> </span><span class="hl-4">script</span><span class="hl-2"> </span><span class="hl-4">scripts/foundry/DeployX402Facilitator.s.sol:DeployX402Facilitator</span><span class="hl-2"> </span><span class="hl-9">\</span><br/><span class="hl-2">  </span><span class="hl-5">--rpc-url</span><span class="hl-2"> </span><span class="hl-4">base_sepolia</span><span class="hl-2"> </span><span class="hl-9">\</span><br/><span class="hl-2">  </span><span class="hl-5">--broadcast</span><span class="hl-2"> </span><span class="hl-9">\</span><br/><span class="hl-2">  </span><span class="hl-5">--verify</span><span class="hl-2"> </span><span class="hl-9">\</span><br/><span class="hl-2">  </span><span class="hl-5">-vvvv</span>
-</code><button type="button">Copy</button></pre>
-
-<p><strong>Important:</strong> Save the deployed contract address!</p>
-<pre><code class="bash"><span class="hl-0"># Verify deployment</span><br/><span class="hl-1">FACILITATOR_ADDRESS</span><span class="hl-2">=</span><span class="hl-4">0x...</span><span class="hl-2"> </span><span class="hl-3">forge</span><span class="hl-2"> </span><span class="hl-4">script</span><span class="hl-2"> </span><span class="hl-4">scripts/foundry/VerifyDeployment.s.sol:VerifyDeployment</span><span class="hl-2"> </span><span class="hl-9">\</span><br/><span class="hl-2">  </span><span class="hl-5">--rpc-url</span><span class="hl-2"> </span><span class="hl-4">base_sepolia</span><span class="hl-2"> </span><span class="hl-9">\</span><br/><span class="hl-2">  </span><span class="hl-5">-vvvv</span>
-</code><button type="button">Copy</button></pre>
-
-<h3 id="step-2-deploy-cre-workflow" class="tsd-anchor-link">Step 2: Deploy CRE Workflow<a href="#step-2-deploy-cre-workflow" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<p>The CRE workflow handles payment verification and settlement submission.</p>
-<pre><code class="bash"><span class="hl-0"># Navigate to workflow directory</span><br/><span class="hl-3">cd</span><span class="hl-2"> </span><span class="hl-4">x402-workflow</span><br/><br/><span class="hl-0"># Install dependencies</span><br/><span class="hl-3">bun</span><span class="hl-2"> </span><span class="hl-4">install</span><br/><br/><span class="hl-0"># Update config with your facilitator address</span><br/><span class="hl-0"># Edit config.staging.json:</span><br/><span class="hl-2">{</span><br/><span class="hl-2">  </span><span class="hl-3">&quot;facilitatorAddress&quot;</span><span class="hl-3">:</span><span class="hl-2"> </span><span class="hl-4">&quot;0xYOUR_DEPLOYED_ADDRESS&quot;,</span><br/><span class="hl-2">  </span><span class="hl-3">&quot;chainName&quot;</span><span class="hl-3">:</span><span class="hl-2"> </span><span class="hl-4">&quot;base-testnet-sepolia&quot;</span><br/><span class="hl-2">}</span><br/><br/><span class="hl-0"># Login to CRE</span><br/><span class="hl-3">cre</span><span class="hl-2"> </span><span class="hl-4">login</span><br/><br/><span class="hl-0"># Simulate workflow locally (test before deployment)</span><br/><span class="hl-3">cre</span><span class="hl-2"> </span><span class="hl-4">workflow</span><span class="hl-2"> </span><span class="hl-4">simulate</span><span class="hl-2"> </span><span class="hl-4">.</span><span class="hl-2"> </span><span class="hl-5">--target</span><span class="hl-2"> </span><span class="hl-4">staging-settings</span><span class="hl-2"> </span><span class="hl-9">\</span><br/><span class="hl-2">  </span><span class="hl-5">--http-payload</span><span class="hl-2"> </span><span class="hl-4">&#39;{&quot;action&quot;:&quot;verify&quot;,&quot;signature&quot;:&quot;0x...&quot;,&quot;authorization&quot;:{...}}&#39;</span><br/><br/><span class="hl-0"># Deploy workflow to CRE DON</span><br/><span class="hl-3">cre</span><span class="hl-2"> </span><span class="hl-4">workflow</span><span class="hl-2"> </span><span class="hl-4">deploy</span><span class="hl-2"> </span><span class="hl-4">.</span><span class="hl-2"> </span><span class="hl-5">--target</span><span class="hl-2"> </span><span class="hl-4">staging-settings</span>
-</code><button type="button">Copy</button></pre>
-
-<p><strong>Save the workflow endpoint URL</strong> from the deploy output.</p>
-<h3 id="step-3-configure-and-test" class="tsd-anchor-link">Step 3: Configure and Test<a href="#step-3-configure-and-test" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<ol>
-<li><strong>Update CRE client configuration:</strong></li>
+<ol start="4">
+<li><strong>Run the Example App:</strong></li>
 </ol>
-<pre><code class="typescript"><span class="hl-0">// In your application</span><br/><span class="hl-6">import</span><span class="hl-2"> { </span><span class="hl-1">createCREClient</span><span class="hl-2"> } </span><span class="hl-6">from</span><span class="hl-2"> </span><span class="hl-4">&#39;x402-chainlink&#39;</span><span class="hl-2">;</span><br/><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-8">creClient</span><span class="hl-2"> = </span><span class="hl-3">createCREClient</span><span class="hl-2">({</span><br/><span class="hl-2">  </span><span class="hl-1">endpoint:</span><span class="hl-2"> </span><span class="hl-4">&#39;https://cre.chain.link/v1/workflows/YOUR_WORKFLOW_ID/trigger&#39;</span><span class="hl-2">,</span><br/><span class="hl-2">  </span><span class="hl-1">network:</span><span class="hl-2"> </span><span class="hl-4">&#39;eip155:84532&#39;</span><span class="hl-2">, </span><span class="hl-0">// Base Sepolia</span><br/><span class="hl-2">  </span><span class="hl-1">facilitatorAddress:</span><span class="hl-2"> </span><span class="hl-4">&#39;0xYOUR_FACILITATOR_ADDRESS&#39;</span><span class="hl-2">,</span><br/><span class="hl-2">  </span><span class="hl-1">simulation:</span><span class="hl-2"> </span><span class="hl-5">false</span><span class="hl-2">, </span><span class="hl-0">// Use real CRE workflow</span><br/><span class="hl-2">});</span>
+<pre><code class="bash"><span class="hl-6">npm</span><span class="hl-1"> </span><span class="hl-3">run</span><span class="hl-1"> </span><span class="hl-3">dev:example</span><br/>
 </code><button type="button">Copy</button></pre>
 
-<ol start="2">
-<li><strong>Token approval options:</strong></li>
-</ol>
-<p>Users can authorize payments in two ways:</p>
-<p><strong>Option A: Traditional Approval (requires on-chain transaction)</strong></p>
-<pre><code class="typescript"><span class="hl-0">// User approves facilitator to spend their USDC</span><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-8">usdc</span><span class="hl-2"> = </span><span class="hl-3">getContract</span><span class="hl-2">({</span><br/><span class="hl-2">  </span><span class="hl-1">address:</span><span class="hl-2"> </span><span class="hl-8">USDC_ADDRESS</span><span class="hl-2">,</span><br/><span class="hl-2">  </span><span class="hl-1">abi:</span><span class="hl-2"> </span><span class="hl-1">erc20Abi</span><span class="hl-2">,</span><br/><span class="hl-2">  </span><span class="hl-1">client:</span><span class="hl-2"> </span><span class="hl-1">walletClient</span><span class="hl-2">,</span><br/><span class="hl-2">});</span><br/><br/><span class="hl-6">await</span><span class="hl-2"> </span><span class="hl-1">usdc</span><span class="hl-2">.</span><span class="hl-1">write</span><span class="hl-2">.</span><span class="hl-3">approve</span><span class="hl-2">([</span><br/><span class="hl-2">  </span><span class="hl-8">FACILITATOR_ADDRESS</span><span class="hl-2">,</span><br/><span class="hl-2">  </span><span class="hl-3">parseUnits</span><span class="hl-2">(</span><span class="hl-4">&#39;1000&#39;</span><span class="hl-2">, </span><span class="hl-7">6</span><span class="hl-2">), </span><span class="hl-0">// Approve 1000 USDC</span><br/><span class="hl-2">]);</span>
-</code><button type="button">Copy</button></pre>
-
-<p><strong>Option B: Zero-Setup with EIP-2612 Permit (no approval transaction needed)</strong></p>
-<p>For supported tokens (USDC, DAI), users can sign a permit that authorizes spending in the same flow as the payment. See <a href="#-zero-setup-payments-eip-2612-permit">Zero-Setup Payments</a> for details.</p>
-<ol start="3">
-<li><strong>Test the full flow:</strong></li>
-</ol>
-<pre><code class="bash"><span class="hl-0"># Run integration test</span><br/><span class="hl-3">bun</span><span class="hl-2"> </span><span class="hl-4">scripts/manual-test-simulation.ts</span><br/><br/><span class="hl-0"># Or test with real deployment</span><br/><span class="hl-3">bun</span><span class="hl-2"> </span><span class="hl-4">scripts/test-express-server.ts</span>
-</code><button type="button">Copy</button></pre>
-
-<h3 id="deployment-checklist" class="tsd-anchor-link">Deployment Checklist<a href="#deployment-checklist" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<h2 id="🤝-contributing-next-steps" class="tsd-anchor-link">🤝 Contributing &amp; Next Steps<a href="#🤝-contributing-next-steps" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>This project is open-source and actively seeking contributions. Future roadmap items include:</p>
 <ul>
-<li>[ ] X402Facilitator deployed and verified</li>
-<li>[ ] CRE workflow deployed and registered</li>
-<li>[ ] Config files updated with addresses</li>
-<li>[ ] Users have approved facilitator OR using permit-enabled tokens</li>
-<li>[ ] End-to-end test passing</li>
+<li>Full native Solana program integration.</li>
+<li>Subscription/recurring payment models using Chainlink Automation.</li>
+<li>Native browser extension for background x402 automated settlements.</li>
 </ul>
 <hr>
-<h2 id="zero-setup-payments-eip-2612-permit" class="tsd-anchor-link">Zero-Setup Payments (EIP-2612 Permit)<a href="#zero-setup-payments-eip-2612-permit" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
-<p>For tokens that support EIP-2612 (USDC, DAI, and most modern tokens), users can make payments <strong>without any prior approval transaction</strong>. The approval is signed off-chain and executed atomically with the payment.</p>
-<h3 id="how-it-works" class="tsd-anchor-link">How It Works<a href="#how-it-works" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<pre><code><span class="hl-1">Traditional</span><span class="hl-2"> </span><span class="hl-3">Flow</span><span class="hl-2"> (</span><span class="hl-7">2</span><span class="hl-2"> </span><span class="hl-1">transactions</span><span class="hl-2">):</span><br/><span class="hl-2">┌──────────┐   </span><span class="hl-7">1.</span><span class="hl-2"> </span><span class="hl-3">approve</span><span class="hl-2">()   ┌──────────┐   </span><span class="hl-7">2.</span><span class="hl-2"> </span><span class="hl-1">payment</span><span class="hl-2">   ┌──────────┐</span><br/><span class="hl-2">│   </span><span class="hl-1">User</span><span class="hl-2">   ├─────────────────►│  </span><span class="hl-1">Token</span><span class="hl-2">   │                │  </span><span class="hl-1">Server</span><span class="hl-2">  │</span><br/><span class="hl-2">│          │                  │          │◄───────────────┤          │</span><br/><span class="hl-2">│          │                  │          │  </span><span class="hl-1">transferFrom</span><span class="hl-2">  │          │</span><br/><span class="hl-2">└──────────┘                  └──────────┘                └──────────┘</span><br/><br/><span class="hl-1">Zero</span><span class="hl-2">-</span><span class="hl-1">Setup</span><span class="hl-2"> </span><span class="hl-3">Flow</span><span class="hl-2"> (</span><span class="hl-7">0</span><span class="hl-2"> </span><span class="hl-1">transactions</span><span class="hl-2">):</span><br/><span class="hl-2">┌──────────┐  </span><span class="hl-1">sign</span><span class="hl-2"> </span><span class="hl-1">permit</span><span class="hl-2"> +   ┌──────────┐   </span><span class="hl-3">permit</span><span class="hl-2">() +   ┌──────────┐</span><br/><span class="hl-2">│   </span><span class="hl-1">User</span><span class="hl-2">   │  </span><span class="hl-1">sign</span><span class="hl-2"> </span><span class="hl-1">payment</span><span class="hl-2">    │  </span><span class="hl-1">Server</span><span class="hl-2">  │  </span><span class="hl-1">transferFrom</span><span class="hl-2">  │  </span><span class="hl-1">Token</span><span class="hl-2">   │</span><br/><span class="hl-2">│          ├─────────────────►│          ├───────────────►│          │</span><br/><span class="hl-2">│          │  (</span><span class="hl-1">off</span><span class="hl-2">-</span><span class="hl-1">chain</span><span class="hl-2">)     │          │   (</span><span class="hl-1">atomic</span><span class="hl-2">)     │          │</span><br/><span class="hl-2">└──────────┘                  └──────────┘                └──────────┘</span>
-</code><button>Copy</button></pre>
-
-<h3 id="supported-tokens" class="tsd-anchor-link">Supported Tokens<a href="#supported-tokens" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<table>
-<thead>
-<tr>
-<th>Token</th>
-<th>Networks</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>USDC</td>
-<td>Ethereum, Base, Arbitrum, Optimism, Polygon (mainnet &amp; testnet)</td>
-</tr>
-<tr>
-<td>DAI</td>
-<td>Ethereum mainnet</td>
-</tr>
-</tbody>
-</table>
-<p>Check support programmatically:</p>
-<pre><code class="typescript"><span class="hl-6">import</span><span class="hl-2"> { </span><span class="hl-1">checkPermitSupport</span><span class="hl-2"> } </span><span class="hl-6">from</span><span class="hl-2"> </span><span class="hl-4">&#39;x402-chainlink&#39;</span><span class="hl-2">;</span><br/><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-8">supportsPermit</span><span class="hl-2"> = </span><span class="hl-3">checkPermitSupport</span><span class="hl-2">(</span><br/><span class="hl-2">  </span><span class="hl-4">&#39;0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913&#39;</span><span class="hl-2">, </span><span class="hl-0">// USDC on Base</span><br/><span class="hl-2">  </span><span class="hl-7">8453</span><span class="hl-2"> </span><span class="hl-0">// Chain ID</span><br/><span class="hl-2">);</span><br/><span class="hl-1">console</span><span class="hl-2">.</span><span class="hl-3">log</span><span class="hl-2">(</span><span class="hl-1">supportsPermit</span><span class="hl-2">); </span><span class="hl-0">// true</span>
-</code><button type="button">Copy</button></pre>
-
-<h3 id="client-side-usage" class="tsd-anchor-link">Client-Side Usage<a href="#client-side-usage" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<pre><code class="typescript"><span class="hl-6">import</span><span class="hl-2"> {</span><br/><span class="hl-2">  </span><span class="hl-1">createPaymentPayloadWithPermit</span><span class="hl-2">,</span><br/><span class="hl-2">  </span><span class="hl-1">checkPermitSupport</span><span class="hl-2">,</span><br/><span class="hl-2">} </span><span class="hl-6">from</span><span class="hl-2"> </span><span class="hl-4">&#39;x402-chainlink&#39;</span><span class="hl-2">;</span><br/><br/><span class="hl-0">// Check if token supports permit</span><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-8">tokenAddress</span><span class="hl-2"> = </span><span class="hl-1">paymentRequirements</span><span class="hl-2">.</span><span class="hl-1">asset</span><span class="hl-2">;</span><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-8">chainId</span><span class="hl-2"> = </span><span class="hl-7">8453</span><span class="hl-2">; </span><span class="hl-0">// Base</span><br/><br/><span class="hl-6">if</span><span class="hl-2"> (</span><span class="hl-3">checkPermitSupport</span><span class="hl-2">(</span><span class="hl-1">tokenAddress</span><span class="hl-2">, </span><span class="hl-1">chainId</span><span class="hl-2">)) {</span><br/><span class="hl-2">  </span><span class="hl-0">// Create payment with permit - no prior approval needed!</span><br/><span class="hl-2">  </span><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-8">payload</span><span class="hl-2"> = </span><span class="hl-6">await</span><span class="hl-2"> </span><span class="hl-3">createPaymentPayloadWithPermit</span><span class="hl-2">(</span><br/><span class="hl-2">    </span><span class="hl-1">walletClient</span><span class="hl-2">,</span><br/><span class="hl-2">    </span><span class="hl-1">publicClient</span><span class="hl-2">,</span><br/><span class="hl-2">    </span><span class="hl-7">2</span><span class="hl-2">, </span><span class="hl-0">// x402 version</span><br/><span class="hl-2">    </span><span class="hl-1">paymentRequirements</span><span class="hl-2">,</span><br/><span class="hl-2">    </span><span class="hl-1">creConfig</span><span class="hl-2">,</span><br/><span class="hl-2">    {</span><br/><span class="hl-2">      </span><span class="hl-1">includePermit:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2">,</span><br/><span class="hl-2">      </span><span class="hl-1">facilitatorAddress:</span><span class="hl-2"> </span><span class="hl-4">&#39;0x...&#39;</span><span class="hl-2">, </span><span class="hl-0">// X402Facilitator address</span><br/><span class="hl-2">    }</span><br/><span class="hl-2">  );</span><br/><br/><span class="hl-2">  </span><span class="hl-0">// The payload now includes the permit signature</span><br/><span class="hl-2">  </span><span class="hl-0">// Server will execute permit + transferFrom atomically</span><br/><span class="hl-2">} </span><span class="hl-6">else</span><span class="hl-2"> {</span><br/><span class="hl-2">  </span><span class="hl-0">// Fallback to traditional flow (requires prior approval)</span><br/><span class="hl-2">  </span><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-8">payload</span><span class="hl-2"> = </span><span class="hl-6">await</span><span class="hl-2"> </span><span class="hl-3">createPaymentPayload</span><span class="hl-2">(</span><br/><span class="hl-2">    </span><span class="hl-1">walletClient</span><span class="hl-2">,</span><br/><span class="hl-2">    </span><span class="hl-7">2</span><span class="hl-2">,</span><br/><span class="hl-2">    </span><span class="hl-1">paymentRequirements</span><span class="hl-2">,</span><br/><span class="hl-2">    </span><span class="hl-1">creConfig</span><br/><span class="hl-2">  );</span><br/><span class="hl-2">}</span>
-</code><button type="button">Copy</button></pre>
-
-<h3 id="how-permit-works-under-the-hood" class="tsd-anchor-link">How Permit Works Under the Hood<a href="#how-permit-works-under-the-hood" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<ol>
-<li>
-<p><strong>Client signs two messages</strong> (both off-chain, no gas):</p>
-<ul>
-<li>EIP-712 Payment Authorization (x402 payment)</li>
-<li>EIP-2612 Permit (token approval)</li>
-</ul>
-</li>
-<li>
-<p><strong>Server receives both signatures</strong> and submits to CRE workflow</p>
-</li>
-<li>
-<p><strong>X402Facilitator contract</strong>:</p>
-<ul>
-<li>Calls <code>permit()</code> on the token contract</li>
-<li>Immediately calls <code>transferFrom()</code></li>
-<li>Both happen in the same transaction</li>
-</ul>
-</li>
-<li>
-<p><strong>Front-running protection</strong>: If the permit fails (e.g., front-run by another tx), the contract checks if sufficient allowance already exists and continues</p>
-</li>
-</ol>
-<h3 id="permit-security" class="tsd-anchor-link">Permit Security<a href="#permit-security" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<p>The EIP-2612 permit includes:</p>
-<ul>
-<li><strong>Deadline</strong>: Permit expires after a set time</li>
-<li><strong>Nonce</strong>: Replay protection (managed by token contract)</li>
-<li><strong>Domain separation</strong>: Signature is chain and token specific</li>
-</ul>
-<pre><code class="solidity">// In X402Facilitator.sol
-function _executePermitIfNeeded(...) internal {
-    try IERC20Permit(token).permit(owner, spender, value, deadline, v, r, s) {
-        // Permit succeeded
-    } catch {
-        // Permit failed - check if allowance exists
-        if (IERC20(token).allowance(owner, spender) >= value) {
-            // Continue with existing allowance
-        } else {
-            revert InsufficientAllowance(...);
-        }
-    }
-}
-</code><button type="button">Copy</button></pre>
-
-<h3 id="when-to-use-permit" class="tsd-anchor-link">When to Use Permit<a href="#when-to-use-permit" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<table>
-<thead>
-<tr>
-<th>Scenario</th>
-<th>Recommendation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>User's first payment</td>
-<td>Use permit (no setup needed)</td>
-</tr>
-<tr>
-<td>High-value repeated payments</td>
-<td>Consider traditional approval for unlimited amount</td>
-</tr>
-<tr>
-<td>Unsupported token (USDT, etc.)</td>
-<td>Must use traditional approval</td>
-</tr>
-<tr>
-<td>Maximum UX simplicity</td>
-<td>Always try permit first</td>
-</tr>
-</tbody>
-</table>
-<hr>
-<h2 id="architecture" class="tsd-anchor-link">Architecture<a href="#architecture" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
-<pre><code><span class="hl-2">┌─────────┐     </span><span class="hl-7">402</span><span class="hl-2"> </span><span class="hl-1">Response</span><span class="hl-2">      ┌─────────┐</span><br/><span class="hl-2">│  </span><span class="hl-1">Client</span><span class="hl-2"> ├──────────────────────►│  </span><span class="hl-1">Server</span><span class="hl-2"> │</span><br/><span class="hl-2">│         │◄──────────────────────┤         │</span><br/><span class="hl-2">│         │  </span><span class="hl-1">PaymentRequirements</span><span class="hl-2">  │         │</span><br/><span class="hl-2">│         │                       │         │</span><br/><span class="hl-2">│ </span><span class="hl-1">Signs</span><span class="hl-2">   │  </span><span class="hl-1">Request</span><span class="hl-2"> + </span><span class="hl-1">Signature</span><span class="hl-2">  │         │</span><br/><span class="hl-2">│ </span><span class="hl-8">EIP</span><span class="hl-2">-</span><span class="hl-7">712</span><span class="hl-2"> ├──────────────────────►│         │</span><br/><span class="hl-2">│         │                       │         │</span><br/><span class="hl-2">└─────────┘                       └────┬────┘</span><br/><span class="hl-2">                                       │</span><br/><span class="hl-2">                                       │ </span><span class="hl-8">HTTP</span><span class="hl-2"> </span><span class="hl-1">Trigger</span><br/><span class="hl-2">                                       ▼</span><br/><span class="hl-2">                               ┌───────────────┐</span><br/><span class="hl-2">                               │  </span><span class="hl-8">CRE</span><span class="hl-2"> </span><span class="hl-1">Workflow</span><span class="hl-2"> │</span><br/><span class="hl-2">                               │               │</span><br/><span class="hl-2">                               │ </span><span class="hl-7">1.</span><span class="hl-2"> </span><span class="hl-1">Verify</span><span class="hl-2"> </span><span class="hl-1">sig</span><span class="hl-2"> │</span><br/><span class="hl-2">                               │ </span><span class="hl-7">2.</span><span class="hl-2"> </span><span class="hl-8">EVM</span><span class="hl-2"> </span><span class="hl-1">Read</span><span class="hl-2">   │</span><br/><span class="hl-2">                               │    (</span><span class="hl-1">balance</span><span class="hl-2">)  │</span><br/><span class="hl-2">                               │ </span><span class="hl-7">3.</span><span class="hl-2"> </span><span class="hl-8">EVM</span><span class="hl-2"> </span><span class="hl-1">Write</span><span class="hl-2">  │</span><br/><span class="hl-2">                               │    (</span><span class="hl-1">report</span><span class="hl-2">)   │</span><br/><span class="hl-2">                               └───────┬───────┘</span><br/><span class="hl-2">                                       │</span><br/><span class="hl-2">                                       │ </span><span class="hl-1">Signed</span><span class="hl-2"> </span><span class="hl-1">Report</span><br/><span class="hl-2">                                       ▼</span><br/><span class="hl-2">                          ┌─────────────────────────┐</span><br/><span class="hl-2">                          │  </span><span class="hl-1">KeystoneForwarder</span><span class="hl-2">      │</span><br/><span class="hl-2">                          │  (</span><span class="hl-1">Chainlink</span><span class="hl-2"> </span><span class="hl-1">Contract</span><span class="hl-2">)   │</span><br/><span class="hl-2">                          └───────────┬─────────────┘</span><br/><span class="hl-2">                                      │</span><br/><span class="hl-2">                                      │ </span><span class="hl-3">onReport</span><span class="hl-2">(</span><span class="hl-1">metadata</span><span class="hl-2">, </span><span class="hl-1">report</span><span class="hl-2">)</span><br/><span class="hl-2">                                      ▼</span><br/><span class="hl-2">                          ┌─────────────────────────┐</span><br/><span class="hl-2">                          │  </span><span class="hl-1">X402Facilitator</span><span class="hl-2">        │</span><br/><span class="hl-2">                          │  (</span><span class="hl-1">Our</span><span class="hl-2"> </span><span class="hl-1">Contract</span><span class="hl-2">)         │</span><br/><span class="hl-2">                          │                         │</span><br/><span class="hl-2">                          │  </span><span class="hl-1">Decodes</span><span class="hl-2"> </span><span class="hl-10">report</span><span class="hl-2">:        │</span><br/><span class="hl-2">                          │  - </span><span class="hl-1">from</span><span class="hl-2">, </span><span class="hl-1">to</span><span class="hl-2">, </span><span class="hl-1">amount</span><span class="hl-2">     │</span><br/><span class="hl-2">                          │  - </span><span class="hl-1">token</span><span class="hl-2">, </span><span class="hl-1">nonce</span><span class="hl-2">         │</span><br/><span class="hl-2">                          │  - </span><span class="hl-1">signature</span><span class="hl-2">            │</span><br/><span class="hl-2">                          │  - </span><span class="hl-3">permit</span><span class="hl-2"> (</span><span class="hl-1">optional</span><span class="hl-2">)    │</span><br/><span class="hl-2">                          │                         │</span><br/><span class="hl-2">                          │  </span><span class="hl-7">1.</span><span class="hl-2"> </span><span class="hl-1">Executes</span><span class="hl-2"> </span><span class="hl-3">permit</span><span class="hl-2">()   │</span><br/><span class="hl-2">                          │     (</span><span class="hl-1">if</span><span class="hl-2"> </span><span class="hl-1">provided</span><span class="hl-2">)       │</span><br/><span class="hl-2">                          │  </span><span class="hl-7">2.</span><span class="hl-2"> </span><span class="hl-1">Executes</span><span class="hl-2"> </span><span class="hl-1">transferFrom</span><span class="hl-2">│</span><br/><span class="hl-2">                          └───────────┬─────────────┘</span><br/><span class="hl-2">                                      │</span><br/><span class="hl-2">                                      ▼</span><br/><span class="hl-2">                          ┌─────────────────────────┐</span><br/><span class="hl-2">                          │  </span><span class="hl-8">ERC</span><span class="hl-2">-</span><span class="hl-7">20</span><span class="hl-2"> </span><span class="hl-1">Token</span><span class="hl-2">           │</span><br/><span class="hl-2">                          │  (</span><span class="hl-8">USDC</span><span class="hl-2">, </span><span class="hl-1">etc</span><span class="hl-2">.)           │</span><br/><span class="hl-2">                          └─────────────────────────┘</span>
-</code><button>Copy</button></pre>
-
-<h3 id="components" class="tsd-anchor-link">Components<a href="#components" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<table>
-<thead>
-<tr>
-<th>Component</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Client Library</strong></td>
-<td>Signs EIP-712 payment authorizations (viem)</td>
-</tr>
-<tr>
-<td><strong>Server Middleware</strong></td>
-<td>Express middleware for 402 flow</td>
-</tr>
-<tr>
-<td><strong>CRE Workflow</strong></td>
-<td>Verifies payments and submits settlements</td>
-</tr>
-<tr>
-<td><strong>X402Facilitator</strong></td>
-<td>Smart contract for on-chain settlement</td>
-</tr>
-<tr>
-<td><strong>KeystoneForwarder</strong></td>
-<td>Chainlink contract that forwards reports</td>
-</tr>
-</tbody>
-</table>
-<hr>
-<h2 id="project-structure" class="tsd-anchor-link">Project Structure<a href="#project-structure" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
-<pre><code><span class="hl-1">x402</span><span class="hl-2">-</span><span class="hl-1">starknet</span><span class="hl-2">/</span><br/><span class="hl-2">├── </span><span class="hl-1">contracts</span><span class="hl-2">/                    # </span><span class="hl-1">Solidity</span><span class="hl-2"> </span><span class="hl-1">smart</span><span class="hl-2"> </span><span class="hl-1">contracts</span><br/><span class="hl-2">│   ├── </span><span class="hl-1">X402Facilitator</span><span class="hl-2">.</span><span class="hl-1">sol</span><span class="hl-2">      # </span><span class="hl-1">Main</span><span class="hl-2"> </span><span class="hl-1">settlement</span><span class="hl-2"> </span><span class="hl-1">contract</span><br/><span class="hl-2">│   ├── </span><span class="hl-1">interfaces</span><span class="hl-2">/</span><br/><span class="hl-2">│   │   └── </span><span class="hl-1">IReceiver</span><span class="hl-2">.</span><span class="hl-1">sol</span><span class="hl-2">        # </span><span class="hl-1">Chainlink</span><span class="hl-2"> </span><span class="hl-1">IReceiver</span><span class="hl-2"> </span><span class="hl-5">interface</span><br/><span class="hl-2">│   └── </span><span class="hl-11">test</span><span class="hl-2">/</span><br/><span class="hl-2">│       └── </span><span class="hl-11">X402Facilitator</span><span class="hl-2">.</span><span class="hl-11">t</span><span class="hl-2">.</span><span class="hl-11">sol</span><span class="hl-2"> # </span><span class="hl-11">Foundry</span><span class="hl-2"> </span><span class="hl-11">tests</span><br/><span class="hl-2">├── </span><span class="hl-11">x402</span><span class="hl-2">-</span><span class="hl-11">workflow</span><span class="hl-2">/                # </span><span class="hl-11">CRE</span><span class="hl-2"> </span><span class="hl-11">workflow</span><br/><span class="hl-2">│   ├── </span><span class="hl-11">main</span><span class="hl-2">.</span><span class="hl-11">ts</span><span class="hl-2">                  # </span><span class="hl-11">Workflow</span><span class="hl-2"> </span><span class="hl-11">entry</span><span class="hl-2"> </span><span class="hl-11">point</span><br/><span class="hl-2">│   ├── </span><span class="hl-11">abi</span><span class="hl-2">/                     # </span><span class="hl-11">Contract</span><span class="hl-2"> </span><span class="hl-11">ABIs</span><br/><span class="hl-2">│   ├── </span><span class="hl-11">workflow</span><span class="hl-2">.</span><span class="hl-11">yaml</span><span class="hl-2">            # </span><span class="hl-11">Workflow</span><span class="hl-2"> </span><span class="hl-11">configuration</span><br/><span class="hl-2">│   ├── </span><span class="hl-11">config</span><span class="hl-2">.</span><span class="hl-11">staging</span><span class="hl-2">.</span><span class="hl-11">json</span><span class="hl-2">      # </span><span class="hl-11">Testnet</span><span class="hl-2"> </span><span class="hl-11">config</span><br/><span class="hl-2">│   └── </span><span class="hl-11">config</span><span class="hl-2">.</span><span class="hl-11">production</span><span class="hl-2">.</span><span class="hl-11">json</span><span class="hl-2">   # </span><span class="hl-11">Mainnet</span><span class="hl-2"> </span><span class="hl-11">config</span><br/><span class="hl-2">├── </span><span class="hl-11">src</span><span class="hl-2">/                          # </span><span class="hl-11">TypeScript</span><span class="hl-2"> </span><span class="hl-11">library</span><br/><span class="hl-2">│   ├── </span><span class="hl-11">cre</span><span class="hl-2">/                     # </span><span class="hl-11">CRE</span><span class="hl-2"> </span><span class="hl-11">client</span><span class="hl-2"> </span><span class="hl-11">integration</span><br/><span class="hl-2">│   ├── </span><span class="hl-11">payment</span><span class="hl-2">/                 # </span><span class="hl-11">Payment</span><span class="hl-2"> </span><span class="hl-11">verification</span><br/><span class="hl-2">│   └── </span><span class="hl-11">types</span><span class="hl-2">/                   # </span><span class="hl-11">Type</span><span class="hl-2"> </span><span class="hl-11">definitions</span><br/><span class="hl-2">├── </span><span class="hl-11">scripts</span><span class="hl-2">/                      # </span><span class="hl-11">Test</span><span class="hl-2"> </span><span class="hl-11">and</span><span class="hl-2"> </span><span class="hl-11">deployment</span><span class="hl-2"> </span><span class="hl-11">scripts</span><br/><span class="hl-2">│   └── </span><span class="hl-11">foundry</span><span class="hl-2">/                 # </span><span class="hl-11">Foundry</span><span class="hl-2"> </span><span class="hl-11">deployment</span><span class="hl-2"> </span><span class="hl-11">scripts</span><br/><span class="hl-2">├── </span><span class="hl-11">project</span><span class="hl-2">.</span><span class="hl-11">yaml</span><span class="hl-2">                  # </span><span class="hl-11">CRE</span><span class="hl-2"> </span><span class="hl-11">project</span><span class="hl-2"> </span><span class="hl-11">configuration</span><br/><span class="hl-2">├── </span><span class="hl-11">foundry</span><span class="hl-2">.</span><span class="hl-11">toml</span><span class="hl-2">                  # </span><span class="hl-11">Foundry</span><span class="hl-2"> </span><span class="hl-11">configuration</span><br/><span class="hl-2">└── </span><span class="hl-11">package</span><span class="hl-2">.</span><span class="hl-11">json</span><span class="hl-2">                  # </span><span class="hl-11">Node</span><span class="hl-2"> </span><span class="hl-11">dependencies</span>
-</code><button>Copy</button></pre>
-
-<hr>
-<h2 id="what-is-x402-chainlink" class="tsd-anchor-link">What is x402-chainlink?<a href="#what-is-x402-chainlink" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
-<p><strong>x402-chainlink</strong> enables true micropayments for HTTP APIs by combining:</p>
-<ol>
-<li><strong>HTTP 402 Protocol</strong> - Standard &quot;Payment Required&quot; status code</li>
-<li><strong>EIP-712 Signatures</strong> - Gas-free payment authorization</li>
-<li><strong>Chainlink CRE</strong> - Decentralized verification &amp; settlement</li>
-<li><strong>Multi-chain Support</strong> - Works across any EVM blockchain</li>
-</ol>
-<h3 id="the-problem" class="tsd-anchor-link">The Problem<a href="#the-problem" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<p>Traditional API monetization sucks:</p>
-<ul>
-<li>Minimum transaction amounts ($0.50+ with Stripe)</li>
-<li>High fees (2-3% + fixed costs)</li>
-<li>Subscription lock-in (pay for 1000 calls, use 5)</li>
-<li>Complex OAuth flows</li>
-<li>Centralized payment processors</li>
-</ul>
-<h3 id="the-solution" class="tsd-anchor-link">The Solution<a href="#the-solution" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<p><strong>Benefits:</strong></p>
-<ul>
-<li>Micropayments as low as $0.0001</li>
-<li>No user accounts or authentication</li>
-<li>Cryptographic payment proofs (EIP-712)</li>
-<li>Decentralized verification (Chainlink DON)</li>
-<li>Multi-chain settlement</li>
-<li>Pay only for what you use</li>
-</ul>
-<hr>
-<h2 id="use-cases" class="tsd-anchor-link">Use Cases<a href="#use-cases" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
-<h3 id="1-ai-api-monetization" class="tsd-anchor-link">1. AI API Monetization<a href="#1-ai-api-monetization" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<p>Pay per token instead of monthly subscriptions</p>
-<pre><code class="typescript"><span class="hl-3">buildPaymentRequirements</span><span class="hl-2">({</span><br/><span class="hl-2">  </span><span class="hl-1">amount:</span><span class="hl-2"> </span><span class="hl-3">calculateCost</span><span class="hl-2">(</span><span class="hl-1">tokenCount</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-1">asset:</span><span class="hl-2"> </span><span class="hl-4">&#39;USDC&#39;</span><span class="hl-2">,</span><br/><span class="hl-2">});</span>
-</code><button type="button">Copy</button></pre>
-
-<h3 id="2-data-marketplace" class="tsd-anchor-link">2. Data Marketplace<a href="#2-data-marketplace" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<p>Buy single datasets without subscriptions</p>
-<pre><code class="typescript"><span class="hl-3">buildPaymentRequirements</span><span class="hl-2">({</span><br/><span class="hl-2">  </span><span class="hl-1">amount:</span><span class="hl-2"> </span><span class="hl-7">500000</span><span class="hl-2">, </span><span class="hl-0">// $0.50</span><br/><span class="hl-2">  </span><span class="hl-1">resource:</span><span class="hl-2"> </span><span class="hl-4">&#39;ipfs://QmXyz.../dataset&#39;</span><span class="hl-2">,</span><br/><span class="hl-2">});</span>
-</code><button type="button">Copy</button></pre>
-
-<h3 id="3-decentralized-cdn" class="tsd-anchor-link">3. Decentralized CDN<a href="#3-decentralized-cdn" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<p>Pay per GB bandwidth</p>
-<pre><code class="typescript"><span class="hl-3">buildPaymentRequirements</span><span class="hl-2">({</span><br/><span class="hl-2">  </span><span class="hl-1">amount:</span><span class="hl-2"> </span><span class="hl-3">calculateBandwidthCost</span><span class="hl-2">(</span><span class="hl-1">bytes</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-1">asset:</span><span class="hl-2"> </span><span class="hl-4">&#39;ETH&#39;</span><span class="hl-2">,</span><br/><span class="hl-2">});</span>
-</code><button type="button">Copy</button></pre>
-
-<h3 id="4-iot-micropayments" class="tsd-anchor-link">4. IoT Micropayments<a href="#4-iot-micropayments" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<p>$0.001 per sensor reading at scale</p>
-<pre><code class="typescript"><span class="hl-3">buildPaymentRequirements</span><span class="hl-2">({</span><br/><span class="hl-2">  </span><span class="hl-1">amount:</span><span class="hl-2"> </span><span class="hl-7">1000</span><span class="hl-2">, </span><span class="hl-0">// $0.001</span><br/><span class="hl-2">  </span><span class="hl-1">asset:</span><span class="hl-2"> </span><span class="hl-4">&#39;USDC&#39;</span><span class="hl-2">,</span><br/><span class="hl-2">});</span>
-</code><button type="button">Copy</button></pre>
-
-<hr>
-<h2 id="api-overview" class="tsd-anchor-link">API Overview<a href="#api-overview" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
-<h3 id="server-side" class="tsd-anchor-link">Server Side<a href="#server-side" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<pre><code class="typescript"><span class="hl-6">import</span><span class="hl-2"> {</span><br/><span class="hl-2">  </span><span class="hl-1">buildPaymentRequirements</span><span class="hl-2">,</span><br/><span class="hl-2">  </span><span class="hl-1">verifyPayment</span><span class="hl-2">,</span><br/><span class="hl-2">  </span><span class="hl-1">settlePayment</span><span class="hl-2">,</span><br/><span class="hl-2">} </span><span class="hl-6">from</span><span class="hl-2"> </span><span class="hl-4">&#39;x402-chainlink&#39;</span><span class="hl-2">;</span><br/><br/><span class="hl-0">// Create payment requirements</span><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-8">requirements</span><span class="hl-2"> = </span><span class="hl-3">buildPaymentRequirements</span><span class="hl-2">({</span><br/><span class="hl-2">  </span><span class="hl-1">network:</span><span class="hl-2"> </span><span class="hl-4">&#39;eip155:8453&#39;</span><span class="hl-2">, </span><span class="hl-0">// Base</span><br/><span class="hl-2">  </span><span class="hl-1">amount:</span><span class="hl-2"> </span><span class="hl-7">1000000</span><span class="hl-2">, </span><span class="hl-0">// 1 USDC</span><br/><span class="hl-2">  </span><span class="hl-1">asset:</span><span class="hl-2"> </span><span class="hl-4">&#39;USDC&#39;</span><span class="hl-2">,</span><br/><span class="hl-2">  </span><span class="hl-1">payTo:</span><span class="hl-2"> </span><span class="hl-4">&#39;0xYourAddress&#39;</span><span class="hl-2">,</span><br/><span class="hl-2">  </span><span class="hl-1">maxTimeoutSeconds:</span><span class="hl-2"> </span><span class="hl-7">300</span><span class="hl-2">,</span><br/><span class="hl-2">});</span><br/><br/><span class="hl-0">// Return 402</span><br/><span class="hl-1">res</span><span class="hl-2">.</span><span class="hl-3">status</span><span class="hl-2">(</span><span class="hl-7">402</span><span class="hl-2">).</span><span class="hl-3">json</span><span class="hl-2">({</span><br/><span class="hl-2">  </span><span class="hl-1">x402Version:</span><span class="hl-2"> </span><span class="hl-7">2</span><span class="hl-2">,</span><br/><span class="hl-2">  </span><span class="hl-1">accepts:</span><span class="hl-2"> [</span><span class="hl-1">requirements</span><span class="hl-2">],</span><br/><span class="hl-2">});</span><br/><br/><span class="hl-0">// Verify payment</span><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-8">verification</span><span class="hl-2"> = </span><span class="hl-6">await</span><span class="hl-2"> </span><span class="hl-3">verifyPayment</span><span class="hl-2">(</span><span class="hl-1">publicClient</span><span class="hl-2">, </span><span class="hl-1">payload</span><span class="hl-2">, </span><span class="hl-1">requirements</span><span class="hl-2">);</span><br/><br/><span class="hl-0">// Settle payment</span><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-8">settlement</span><span class="hl-2"> = </span><span class="hl-6">await</span><span class="hl-2"> </span><span class="hl-3">settlePayment</span><span class="hl-2">(</span><span class="hl-1">publicClient</span><span class="hl-2">, </span><span class="hl-1">payload</span><span class="hl-2">, </span><span class="hl-1">requirements</span><span class="hl-2">, {</span><br/><span class="hl-2">  </span><span class="hl-1">creConfig:</span><span class="hl-2"> </span><span class="hl-8">CRE_CONFIG</span><span class="hl-2">,</span><br/><span class="hl-2">});</span>
-</code><button type="button">Copy</button></pre>
-
-<h3 id="client-side" class="tsd-anchor-link">Client Side<a href="#client-side" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<pre><code class="typescript"><span class="hl-6">import</span><span class="hl-2"> { </span><span class="hl-1">createPaymentPayload</span><span class="hl-2"> } </span><span class="hl-6">from</span><span class="hl-2"> </span><span class="hl-4">&#39;x402-chainlink&#39;</span><span class="hl-2">;</span><br/><span class="hl-6">import</span><span class="hl-2"> { </span><span class="hl-1">createWalletClient</span><span class="hl-2"> } </span><span class="hl-6">from</span><span class="hl-2"> </span><span class="hl-4">&#39;viem&#39;</span><span class="hl-2">;</span><br/><br/><span class="hl-0">// Sign payment (EIP-712, 0 gas)</span><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-8">payload</span><span class="hl-2"> = </span><span class="hl-6">await</span><span class="hl-2"> </span><span class="hl-3">createPaymentPayload</span><span class="hl-2">(</span><br/><span class="hl-2">  </span><span class="hl-1">walletClient</span><span class="hl-2">,</span><br/><span class="hl-2">  </span><span class="hl-7">2</span><span class="hl-2">, </span><span class="hl-0">// x402 version</span><br/><span class="hl-2">  </span><span class="hl-1">requirements</span><span class="hl-2">,</span><br/><span class="hl-2">  {</span><br/><span class="hl-2">    </span><span class="hl-1">endpoint:</span><span class="hl-2"> </span><span class="hl-4">&#39;https://cre.chainlink.network&#39;</span><span class="hl-2">,</span><br/><span class="hl-2">    </span><span class="hl-1">network:</span><span class="hl-2"> </span><span class="hl-4">&#39;eip155:8453&#39;</span><span class="hl-2">,</span><br/><span class="hl-2">  }</span><br/><span class="hl-2">);</span><br/><br/><span class="hl-0">// Send with payment</span><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-8">response</span><span class="hl-2"> = </span><span class="hl-6">await</span><span class="hl-2"> </span><span class="hl-3">fetch</span><span class="hl-2">(</span><span class="hl-1">url</span><span class="hl-2">, {</span><br/><span class="hl-2">  </span><span class="hl-1">headers:</span><span class="hl-2"> {</span><br/><span class="hl-2">    </span><span class="hl-4">&#39;X-Payment-Response&#39;</span><span class="hl-1">:</span><span class="hl-2"> </span><span class="hl-1">Buffer</span><span class="hl-2">.</span><span class="hl-3">from</span><span class="hl-2">(</span><span class="hl-8">JSON</span><span class="hl-2">.</span><span class="hl-3">stringify</span><span class="hl-2">(</span><span class="hl-1">payload</span><span class="hl-2">)).</span><span class="hl-3">toString</span><span class="hl-2">(</span><br/><span class="hl-2">      </span><span class="hl-4">&#39;base64&#39;</span><br/><span class="hl-2">    ),</span><br/><span class="hl-2">  },</span><br/><span class="hl-2">});</span>
-</code><button type="button">Copy</button></pre>
-
-<hr>
-<h2 id="security" class="tsd-anchor-link">Security<a href="#security" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
-<p><strong>Multiple layers of protection:</strong></p>
-<ol>
-<li>
-<p><strong>EIP-712 Signatures</strong> - Cryptographic payment authorization</p>
-<ul>
-<li>Prevents tampering</li>
-<li>Domain-bound (no phishing)</li>
-<li>Standard wallet support</li>
-</ul>
-</li>
-<li>
-<p><strong>Nonce Management</strong> - Prevents replay attacks</p>
-<ul>
-<li>Unique per payment</li>
-<li>Tracked on-chain in X402Facilitator</li>
-</ul>
-</li>
-<li>
-<p><strong>Time-Based Expiry</strong> - Prevents stale payments</p>
-<ul>
-<li><code>validUntil</code> timestamp</li>
-<li>Configurable timeout</li>
-</ul>
-</li>
-<li>
-<p><strong>Amount Validation</strong> - Prevents underpayment</p>
-<ul>
-<li>Strict equality checks</li>
-<li>No rounding errors</li>
-</ul>
-</li>
-<li>
-<p><strong>Balance &amp; Allowance Checks</strong> - Prevents insufficient funds</p>
-<ul>
-<li>Verified via CRE EVM Read capability</li>
-<li>Before settlement</li>
-</ul>
-</li>
-<li>
-<p><strong>Decentralized Consensus</strong> - Prevents single-node manipulation</p>
-<ul>
-<li>Multiple Chainlink DON nodes</li>
-<li>Byzantine fault tolerance</li>
-<li>Threshold signatures</li>
-</ul>
-</li>
-<li>
-<p><strong>On-Chain Verification</strong> - Final security layer</p>
-<ul>
-<li>X402Facilitator verifies signature</li>
-<li>Chain ID validation</li>
-<li>Nonce uniqueness enforced</li>
-</ul>
-</li>
-</ol>
-<hr>
-<h2 id="supported-networks" class="tsd-anchor-link">Supported Networks<a href="#supported-networks" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
-<table>
-<thead>
-<tr>
-<th>Network</th>
-<th>Chain ID</th>
-<th>Environment</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Ethereum</td>
-<td><code>eip155:1</code></td>
-<td>Mainnet</td>
-</tr>
-<tr>
-<td>Base</td>
-<td><code>eip155:8453</code></td>
-<td>Mainnet</td>
-</tr>
-<tr>
-<td>Polygon</td>
-<td><code>eip155:137</code></td>
-<td>Mainnet</td>
-</tr>
-<tr>
-<td>Arbitrum</td>
-<td><code>eip155:42161</code></td>
-<td>Mainnet</td>
-</tr>
-<tr>
-<td>Sepolia</td>
-<td><code>eip155:11155111</code></td>
-<td>Testnet</td>
-</tr>
-<tr>
-<td>Base Sepolia</td>
-<td><code>eip155:84532</code></td>
-<td>Testnet</td>
-</tr>
-<tr>
-<td>Arbitrum Sepolia</td>
-<td><code>eip155:421614</code></td>
-<td>Testnet</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Supported Tokens:</strong></p>
-<ul>
-<li>ETH (native)</li>
-<li>USDC</li>
-<li>LINK</li>
-</ul>
-<p><strong>Forwarder Addresses:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Network</th>
-<th>MockForwarder</th>
-<th>KeystoneForwarder</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Base Sepolia</td>
-<td><code>0x15fC6ae953E024d975e77382eEeC56A9101f9F88</code></td>
-<td><code>0x1a1c2103A4BCb04F548e9525D4cc33Ac47f1Ec44</code></td>
-</tr>
-<tr>
-<td>Ethereum Sepolia</td>
-<td><code>0x15fC6ae953E024d975e77382eEeC56A9101f9F88</code></td>
-<td><code>0xF8344CFd5c43616a4366C34E3EEE75af79a74482</code></td>
-</tr>
-</tbody>
-</table>
-<hr>
-<h2 id="comparison" class="tsd-anchor-link">Comparison<a href="#comparison" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
-<h3 id="vs-stripe" class="tsd-anchor-link">vs. Stripe<a href="#vs-stripe" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<table>
-<thead>
-<tr>
-<th>Feature</th>
-<th>x402-chainlink</th>
-<th>Stripe</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Minimum</td>
-<td>$0.0001</td>
-<td>$0.50</td>
-</tr>
-<tr>
-<td>Fee</td>
-<td>~$0.01 gas</td>
-<td>2.9% + $0.30</td>
-</tr>
-<tr>
-<td>Settlement</td>
-<td>1-2 min</td>
-<td>2-7 days</td>
-</tr>
-<tr>
-<td>Chargebacks</td>
-<td>None</td>
-<td>Common</td>
-</tr>
-<tr>
-<td>Decentralized</td>
-<td>Yes</td>
-<td>No</td>
-</tr>
-</tbody>
-</table>
-<h3 id="vs-api-keys" class="tsd-anchor-link">vs. API Keys<a href="#vs-api-keys" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<table>
-<thead>
-<tr>
-<th>Feature</th>
-<th>x402-chainlink</th>
-<th>API Keys</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Payment Enforcement</td>
-<td>Cryptographic</td>
-<td>Trust-based</td>
-</tr>
-<tr>
-<td>Metering</td>
-<td>Built-in</td>
-<td>Custom</td>
-</tr>
-<tr>
-<td>Billing</td>
-<td>Per-request</td>
-<td>Monthly</td>
-</tr>
-<tr>
-<td>User DB</td>
-<td>None</td>
-<td>Required</td>
-</tr>
-</tbody>
-</table>
-<hr>
-<h2 id="testing" class="tsd-anchor-link">Testing<a href="#testing" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
-<pre><code class="bash"><span class="hl-0"># Full simulation (recommended)</span><br/><span class="hl-3">bun</span><span class="hl-2"> </span><span class="hl-4">scripts/manual-test-simulation.ts</span><br/><br/><span class="hl-0"># HTTP integration</span><br/><span class="hl-3">bun</span><span class="hl-2"> </span><span class="hl-4">scripts/test-express-server.ts</span><br/><br/><span class="hl-0"># Smart contract tests</span><br/><span class="hl-3">forge</span><span class="hl-2"> </span><span class="hl-4">test</span><span class="hl-2"> </span><span class="hl-5">-vvv</span><br/><br/><span class="hl-0"># Real network (needs USDC on Base Sepolia)</span><br/><span class="hl-3">bun</span><span class="hl-2"> </span><span class="hl-4">scripts/manual-test.ts</span>
-</code><button type="button">Copy</button></pre>
-
-<p><strong>Test Results:</strong></p>
-<pre><code><span class="hl-2"> </span><span class="hl-1">Payment</span><span class="hl-2"> </span><span class="hl-10">Requirements</span><span class="hl-2">: </span><span class="hl-1">Created</span><br/><span class="hl-2"> </span><span class="hl-8">EIP</span><span class="hl-2">-</span><span class="hl-7">712</span><span class="hl-2"> </span><span class="hl-10">Signing</span><span class="hl-2">: </span><span class="hl-1">Working</span><br/><span class="hl-2"> </span><span class="hl-1">Signature</span><span class="hl-2"> </span><span class="hl-10">Format</span><span class="hl-2">: </span><span class="hl-1">Valid</span><br/><span class="hl-2"> </span><span class="hl-10">Verification</span><span class="hl-2">: </span><span class="hl-1">Passed</span><br/><span class="hl-2"> </span><span class="hl-8">CRE</span><span class="hl-2"> </span><span class="hl-10">Settlement</span><span class="hl-2">: </span><span class="hl-1">Confirmed</span><br/><span class="hl-2"> </span><span class="hl-8">HTTP</span><span class="hl-2"> </span><span class="hl-10">Integration</span><span class="hl-2">: </span><span class="hl-1">Working</span>
-</code><button>Copy</button></pre>
-
-<hr>
-<h2 id="development" class="tsd-anchor-link">Development<a href="#development" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
-<pre><code class="bash"><span class="hl-0"># Install dependencies</span><br/><span class="hl-3">bun</span><span class="hl-2"> </span><span class="hl-4">install</span><br/><br/><span class="hl-0"># Install Foundry dependencies</span><br/><span class="hl-3">forge</span><span class="hl-2"> </span><span class="hl-4">install</span><br/><br/><span class="hl-0"># Build TypeScript</span><br/><span class="hl-3">bun</span><span class="hl-2"> </span><span class="hl-4">run</span><span class="hl-2"> </span><span class="hl-4">build</span><br/><br/><span class="hl-0"># Build contracts</span><br/><span class="hl-3">forge</span><span class="hl-2"> </span><span class="hl-4">build</span><br/><br/><span class="hl-0"># Run tests</span><br/><span class="hl-3">bun</span><span class="hl-2"> </span><span class="hl-4">run</span><span class="hl-2"> </span><span class="hl-4">test</span><br/><span class="hl-3">forge</span><span class="hl-2"> </span><span class="hl-4">test</span><br/><br/><span class="hl-0"># Run manual tests</span><br/><span class="hl-3">bun</span><span class="hl-2"> </span><span class="hl-4">scripts/manual-test-simulation.ts</span>
-</code><button type="button">Copy</button></pre>
-
-<hr>
-<h2 id="documentation" class="tsd-anchor-link">Documentation<a href="#documentation" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
-<ul>
-<li><strong><a href="./ARCHITECTURE.md">Complete Architecture Guide</a></strong> - Deep dive into how everything works</li>
-<li><strong><a href="https://httpwg.org/specs/rfc9110.html#status.402">HTTP 402 Spec</a></strong> - Official HTTP status code</li>
-<li><strong><a href="https://eips.ethereum.org/EIPS/eip-712">EIP-712</a></strong> - Typed structured data hashing</li>
-<li><strong><a href="https://docs.chain.link/cre">Chainlink CRE</a></strong> - Runtime Environment docs</li>
-</ul>
-<hr>
-<h2 id="contributing" class="tsd-anchor-link">Contributing<a href="#contributing" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
-<p>This is a hackathon project demonstrating the migration from Starknet to Chainlink CRE.</p>
-<p><strong>Migration Highlights:</strong></p>
-<ul>
-<li>From Starknet to EVM chains (Ethereum, Base, Polygon, Arbitrum)</li>
-<li>From SNIP-6 signatures to EIP-712 signatures</li>
-<li>From starknet.js to viem</li>
-<li>From Paymaster to Chainlink CRE</li>
-<li>From single-chain to multi-chain</li>
-</ul>
-<hr>
-<h2 id="license" class="tsd-anchor-link">License<a href="#license" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
-<p>Apache-2.0 License - see <a href="media/LICENSE">LICENSE</a></p>
-<hr>
-<h2 id="acknowledgments" class="tsd-anchor-link">Acknowledgments<a href="#acknowledgments" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
-<ul>
-<li><strong>Nethermind</strong> - Original x402 protocol development</li>
-<li><strong>Chainlink</strong> - CRE platform and oracle infrastructure</li>
-<li><strong>Viem</strong> - Excellent TypeScript library for EVM interactions</li>
-</ul>
-<hr>
-<h2 id="links" class="tsd-anchor-link">Links<a href="#links" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
-<ul>
-<li><strong>GitHub:</strong> <a href="https://github.com/NethermindEth/x402-chainlink">NethermindEth/x402-chainlink</a></li>
-<li><strong>x402 Protocol:</strong> <a href="https://x402.org">x402.org</a></li>
-<li><strong>Chainlink:</strong> <a href="https://chain.link">chain.link</a></li>
-</ul>
-<hr>
-<p><strong>Built with care for Chainlink Hackathon 2026</strong></p>
-<p><strong>Making micropayments great again, one HTTP request at a time!</strong></p>
-</div></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-accordion"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-chevronDown"></use></svg><h3>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li></ul></div><div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-chevronDown"></use></svg><h3>On This Page</h3></summary><div class="tsd-accordion-details"><a href="#x402-chainlink"><span>x402-<wbr/>chainlink</span></a><ul><li><a href="#table-of-contents"><span>Table of <wbr/>Contents</span></a></li><li><a href="#quick-start"><span>Quick <wbr/>Start</span></a></li><li><ul><li><a href="#installation"><span>Installation</span></a></li><li><a href="#run-examples"><span>Run <wbr/>Examples</span></a></li></ul></li><li><a href="#production-deployment"><span>Production <wbr/>Deployment</span></a></li><li><ul><li><a href="#prerequisites"><span>Prerequisites</span></a></li><li><a href="#step-1-deploy-x402facilitator-contract"><span>Step 1: <wbr/>Deploy <wbr/>X402<wbr/>Facilitator <wbr/>Contract</span></a></li><li><a href="#step-2-deploy-cre-workflow"><span>Step 2: <wbr/>Deploy <wbr/>CRE <wbr/>Workflow</span></a></li><li><a href="#step-3-configure-and-test"><span>Step 3: <wbr/>Configure and <wbr/>Test</span></a></li><li><a href="#deployment-checklist"><span>Deployment <wbr/>Checklist</span></a></li></ul></li><li><a href="#zero-setup-payments-eip-2612-permit"><span>Zero-<wbr/>Setup <wbr/>Payments (<wbr/>EIP-<wbr/>2612 <wbr/>Permit)</span></a></li><li><ul><li><a href="#how-it-works"><span>How <wbr/>It <wbr/>Works</span></a></li><li><a href="#supported-tokens"><span>Supported <wbr/>Tokens</span></a></li><li><a href="#client-side-usage"><span>Client-<wbr/>Side <wbr/>Usage</span></a></li><li><a href="#how-permit-works-under-the-hood"><span>How <wbr/>Permit <wbr/>Works <wbr/>Under the <wbr/>Hood</span></a></li><li><a href="#permit-security"><span>Permit <wbr/>Security</span></a></li><li><a href="#when-to-use-permit"><span>When to <wbr/>Use <wbr/>Permit</span></a></li></ul></li><li><a href="#architecture"><span>Architecture</span></a></li><li><ul><li><a href="#components"><span>Components</span></a></li></ul></li><li><a href="#project-structure"><span>Project <wbr/>Structure</span></a></li><li><a href="#what-is-x402-chainlink"><span>What is x402-<wbr/>chainlink?</span></a></li><li><ul><li><a href="#the-problem"><span>The <wbr/>Problem</span></a></li><li><a href="#the-solution"><span>The <wbr/>Solution</span></a></li></ul></li><li><a href="#use-cases"><span>Use <wbr/>Cases</span></a></li><li><ul><li><a href="#1-ai-api-monetization"><span>1. <wbr/>AI <wbr/>API <wbr/>Monetization</span></a></li><li><a href="#2-data-marketplace"><span>2. <wbr/>Data <wbr/>Marketplace</span></a></li><li><a href="#3-decentralized-cdn"><span>3. <wbr/>Decentralized <wbr/>CDN</span></a></li><li><a href="#4-iot-micropayments"><span>4. <wbr/>Io<wbr/>T <wbr/>Micropayments</span></a></li></ul></li><li><a href="#api-overview"><span>API <wbr/>Overview</span></a></li><li><ul><li><a href="#server-side"><span>Server <wbr/>Side</span></a></li><li><a href="#client-side"><span>Client <wbr/>Side</span></a></li></ul></li><li><a href="#security"><span>Security</span></a></li><li><a href="#supported-networks"><span>Supported <wbr/>Networks</span></a></li><li><a href="#comparison"><span>Comparison</span></a></li><li><ul><li><a href="#vs-stripe"><span>vs. <wbr/>Stripe</span></a></li><li><a href="#vs-api-keys"><span>vs. <wbr/>API <wbr/>Keys</span></a></li></ul></li><li><a href="#testing"><span>Testing</span></a></li><li><a href="#development"><span>Development</span></a></li><li><a href="#documentation"><span>Documentation</span></a></li><li><a href="#contributing"><span>Contributing</span></a></li><li><a href="#license"><span>License</span></a></li><li><a href="#acknowledgments"><span>Acknowledgments</span></a></li><li><a href="#links"><span>Links</span></a></li></ul></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="modules.html">x402-chainlink</a><ul class="tsd-small-nested-navigation" id="tsd-nav-container"><li>Loading...</li></ul></nav></div></div></div><footer></footer><div class="overlay"></div></body></html>
+<p><em>Empowering the next generation of the decentralized web with seamless, borderless micro-monetization.</em></p>
+</div></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-accordion"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-chevronDown"></use></svg><h3>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li></ul></div><div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-chevronDown"></use></svg><h3>On This Page</h3></summary><div class="tsd-accordion-details"><a href="#x402-chainlink"><span>x402-<wbr/>chainlink</span></a><ul><li><a href="#overview"><span>Overview</span></a></li><li><ul><li><a href="#key-features"><span>Key <wbr/>Features:</span></a></li></ul></li><li><a href="#table-of-contents"><span>Table of contents</span></a></li></ul><a href="#🌐-x402-chainlink-sdk-the-web3-stripe-powered-by-cre"><span>🌐 x402-<wbr/>Chainlink <wbr/>SDK: <wbr/>The <wbr/>Web3 <wbr/>Stripe <wbr/>Powered by <wbr/>CRE</span></a><ul><li><a href="#💡-the-vision-decentralizing-the-payment-processor"><span>💡 <wbr/>The <wbr/>Vision: <wbr/>Decentralizing the <wbr/>Payment <wbr/>Processor</span></a></li><li><ul><li><a href="#🎯-key-use-cases"><span>🎯 <wbr/>Key <wbr/>Use <wbr/>Cases</span></a></li></ul></li><li><a href="#🏗️-architecture-protocol-flow"><span>🏗️ <wbr/>Architecture &amp; <wbr/>Protocol <wbr/>Flow</span></a></li><li><ul><li><a href="#system-architecture"><span>System <wbr/>Architecture</span></a></li><li><a href="#the-x402-negotiation-sequence"><span>The x402 <wbr/>Negotiation <wbr/>Sequence</span></a></li></ul></li><li><a href="#🚀-built-for-the-masses-sdk-usage"><span>🚀 <wbr/>Built for the <wbr/>Masses: <wbr/>SDK <wbr/>Usage</span></a></li><li><ul><li><a href="#1-server-side-protecting-an-endpoint"><span>1. <wbr/>Server-<wbr/>Side: <wbr/>Protecting an <wbr/>Endpoint</span></a></li><li><a href="#2-client-side-consuming-a-paid-endpoint"><span>2. <wbr/>Client-<wbr/>Side: <wbr/>Consuming a <wbr/>Paid <wbr/>Endpoint</span></a></li></ul></li><li><a href="#🛠️-why-chainlink-cre"><span>🛠️ <wbr/>Why <wbr/>Chainlink <wbr/>CRE?</span></a></li><li><a href="#🏁-running-locally"><span>🏁 <wbr/>Running <wbr/>Locally</span></a></li><li><a href="#🤝-contributing-next-steps"><span>🤝 <wbr/>Contributing &amp; <wbr/>Next <wbr/>Steps</span></a></li></ul></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="modules.html">x402-chainlink</a><ul class="tsd-small-nested-navigation" id="tsd-nav-container"><li>Loading...</li></ul></nav></div></div></div><footer></footer><div class="overlay"></div></body></html>
