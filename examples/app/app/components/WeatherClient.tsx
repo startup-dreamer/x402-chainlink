@@ -433,7 +433,7 @@ export default function WeatherClient() {
       )}
 
       {/* Weather data */}
-      {weather && (
+      {weather && agentStep === 'done' && (
         <div className="weather-data-container">
           <div className="location-bar">
             <h3>{weather.location.toUpperCase()}</h3>

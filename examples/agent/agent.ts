@@ -1,16 +1,33 @@
-import { createInterface, type Interface as RlInterface } from 'node:readline/promises';
+import {
+  createInterface,
+  type Interface as RlInterface,
+} from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
 import { config } from 'dotenv';
-import { createAgentWallet, signPaymentPayload, signPermitIfApplicable, encodePaymentPayload, decodePaymentRequired, PAYMENT_HEADERS, type PaymentRequired } from './payment-client.ts';
-import { createChatSession, sendMessage, sendToolResult, DEFAULT_MODEL } from './gemini.ts';
+import {
+  createAgentWallet,
+  signPaymentPayload,
+  signPermitIfApplicable,
+  encodePaymentPayload,
+  decodePaymentRequired,
+  PAYMENT_HEADERS,
+  type PaymentRequired,
+} from './payment-client.ts';
+import {
+  createChatSession,
+  sendMessage,
+  sendToolResult,
+  DEFAULT_MODEL,
+} from './gemini.ts';
 config();
-
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY ?? '';
 const GEMINI_MODEL = process.env.GEMINI_MODEL ?? DEFAULT_MODEL;
-const SENDER_PRIVATE_KEY = (process.env.SENDER_PRIVATE_KEY ?? '') as `0x${string}`;
-const BACKEND_URL = (process.env.BACKEND_URL ?? 'http://localhost:3001').replace(/\/$/, '');
-
+const SENDER_PRIVATE_KEY = (process.env.SENDER_PRIVATE_KEY ??
+  '') as `0x${string}`;
+const BACKEND_URL = (
+  process.env.BACKEND_URL ?? 'http://localhost:3001'
+).replace(/\/$/, '');
 
 function hr(char = '─', len = 60) {
   return char.repeat(len);
@@ -53,7 +70,9 @@ function printPaymentDetails(paymentRequired: PaymentRequired) {
 
   console.log('');
   console.log('  ┌─ Payment Required ───────────────────────────────────┐');
-  console.log(`  │  Amount:    ${amount} ${symbol.padEnd(10)}                      │`);
+  console.log(
+    `  │  Amount:    ${amount} ${symbol.padEnd(10)}                      │`
+  );
   console.log(`  │  Token:     ${shortAsset.padEnd(40)} │`);
   console.log(`  │  Network:   ${req.network.padEnd(40)} │`);
   console.log(`  │  Recipient: ${shortRecipient.padEnd(40)} │`);
@@ -121,7 +140,8 @@ function handleSSEEvent(event: string, data: string) {
     const parsed = JSON.parse(data) as Record<string, unknown>;
 
     if (event === 'settlement_update') {
-      const msg = (parsed.message as string | undefined) ?? 'Settlement in progress...';
+      const msg =
+        (parsed.message as string | undefined) ?? 'Settlement in progress...';
       console.log(`  [Settlement] ${msg}`);
     } else if (event === 'settlement_complete') {
       const success = parsed.success as boolean | undefined;
@@ -129,9 +149,13 @@ function handleSSEEvent(event: string, data: string) {
       const reason = parsed.errorReason as string | undefined;
 
       if (success && txHash && txHash !== '') {
-        console.log(`  [Settlement] Done — tx: https://sepolia.basescan.org/tx/${txHash}`);
+        console.log(
+          `  [Settlement] Done — tx: https://sepolia.basescan.org/tx/${txHash}`
+        );
       } else if (reason === 'cre_cli_unavailable') {
-        console.log('  [Settlement] Simulated (CRE CLI not installed — payment verified, no broadcast)');
+        console.log(
+          '  [Settlement] Simulated (CRE CLI not installed — payment verified, no broadcast)'
+        );
       } else {
         console.log(`  [Settlement] ${reason ?? 'Complete'}`);
       }
@@ -154,7 +178,9 @@ async function executeWeatherPayment(
   walletClient: ReturnType<typeof createAgentWallet>['walletClient'],
   toolArgs: Record<string, unknown>
 ): Promise<WeatherPaymentResult> {
-  console.log(`\n  [Agent] Gemini wants to call: get_weather(${JSON.stringify(toolArgs)})`);
+  console.log(
+    `\n  [Agent] Gemini wants to call: get_weather(${JSON.stringify(toolArgs)})`
+  );
 
   // Build URL — pass the user's query as ?q= so the backend can geocode it
   const query = typeof toolArgs.query === 'string' ? toolArgs.query.trim() : '';
@@ -169,7 +195,7 @@ async function executeWeatherPayment(
 
   if (initialRes.status !== 402) {
     if (initialRes.ok) {
-      const data = await initialRes.json() as Record<string, unknown>;
+      const data = (await initialRes.json()) as Record<string, unknown>;
       console.log('  [Agent] API returned data without payment (unexpected).');
       return { data, settlementId: null };
     }
@@ -177,7 +203,9 @@ async function executeWeatherPayment(
   }
 
   // Step 2: Decode payment requirements
-  const paymentRequiredHeader = initialRes.headers.get(PAYMENT_HEADERS.REQUIRED);
+  const paymentRequiredHeader = initialRes.headers.get(
+    PAYMENT_HEADERS.REQUIRED
+  );
   if (!paymentRequiredHeader) {
     throw new Error('Backend returned 402 but missing PAYMENT-REQUIRED header');
   }
@@ -196,7 +224,10 @@ async function executeWeatherPayment(
 
   if (confirm.trim().toLowerCase() !== 'y') {
     console.log('  [Agent] Payment declined by user.\n');
-    return { data: { error: 'Payment declined by user', weather: null }, settlementId: null };
+    return {
+      data: { error: 'Payment declined by user', weather: null },
+      settlementId: null,
+    };
   }
 
   // Step 4: Sign EIP-712 authorization
@@ -216,11 +247,13 @@ async function executeWeatherPayment(
   });
 
   if (!paidRes.ok) {
-    const body = await paidRes.json().catch(() => ({})) as { error?: string };
-    throw new Error(body.error ?? `Payment rejected: ${paidRes.status} ${paidRes.statusText}`);
+    const body = (await paidRes.json().catch(() => ({}))) as { error?: string };
+    throw new Error(
+      body.error ?? `Payment rejected: ${paidRes.status} ${paidRes.statusText}`
+    );
   }
 
-  const data = await paidRes.json() as {
+  const data = (await paidRes.json()) as {
     success: boolean;
     data: Record<string, unknown>;
     message: string;
@@ -236,12 +269,16 @@ async function executeWeatherPayment(
 async function main() {
   // Validate config
   if (!GEMINI_API_KEY) {
-    console.error('ERROR: GEMINI_API_KEY is not set. Get a free key at https://aistudio.google.com/apikey');
+    console.error(
+      'ERROR: GEMINI_API_KEY is not set. Get a free key at https://aistudio.google.com/apikey'
+    );
     console.error('       Then set it in examples/agent/.env');
     process.exit(1);
   }
   if (!SENDER_PRIVATE_KEY || SENDER_PRIVATE_KEY === '0x') {
-    console.error('ERROR: SENDER_PRIVATE_KEY is not set. Set it in examples/agent/.env');
+    console.error(
+      'ERROR: SENDER_PRIVATE_KEY is not set. Set it in examples/agent/.env'
+    );
     process.exit(1);
   }
 
@@ -294,7 +331,11 @@ async function main() {
         let settlementId: string | null = null;
 
         try {
-          const result = await executeWeatherPayment(rl, walletClient, response.args);
+          const result = await executeWeatherPayment(
+            rl,
+            walletClient,
+            response.args
+          );
           toolResult = result.data;
           settlementId = result.settlementId;
         } catch (err) {
@@ -303,15 +344,21 @@ async function main() {
           toolResult = { error: msg, weather: null };
         }
 
-        // Feed result back to Gemini and get the natural-language reply
-        const finalReply = await sendToolResult(chat, response.name, toolResult);
-        console.log(`\nAgent: ${finalReply}\n`);
-
-        // Wait for settlement outcome before returning prompt
+        // Wait for settlement before showing the weather response
         if (settlementId) {
-          console.log('  [Settlement] Waiting for Chainlink CRE confirmation...');
+          console.log(
+            '  [Settlement] Waiting for Chainlink CRE confirmation...'
+          );
           await watchSettlement(settlementId).catch(() => {});
         }
+
+        // Feed result back to Gemini and get the natural-language reply
+        const finalReply = await sendToolResult(
+          chat,
+          response.name,
+          toolResult
+        );
+        console.log(`\nAgent: ${finalReply}\n`);
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);

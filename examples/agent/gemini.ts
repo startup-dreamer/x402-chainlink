@@ -59,8 +59,8 @@ export type GeminiResponse =
 
 export const DEFAULT_MODEL = 'gemini-2.0-flash-lite';
 
-const MAX_RETRIES = 4;
-const INITIAL_DELAY_MS = 3000;
+const MAX_RETRIES = 5;
+const INITIAL_DELAY_MS = 10000;
 
 function isRateLimit(err: unknown): boolean {
   const msg = err instanceof Error ? err.message : String(err);
