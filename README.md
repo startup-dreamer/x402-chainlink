@@ -3,7 +3,7 @@
         <img src="https://raw.githubusercontent.com/smartcontractkit/chainlink/develop/docs/logo-chainlink-blue.svg" width="225" alt="Chainlink logo">
     </a>
 
-![npm downloads](https://img.shields.io/npm/dt/x402-chainlink?style=flat&label=NPM%20Downloads&color=blue)
+![npm downloads](https://img.shields.io/npm/dt/x402-chainlink?style=flat&label=npm%20downloads&color=blue)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Chainlink Runtime Environment Documentation](https://img.shields.io/static/v1?label=cre-docs&message=latest&color=blue)](https://docs.chain.link/cre)
 
