@@ -80,7 +80,7 @@ export interface DiscoveryParams {
   limit?: number;
   /** Number of results to skip for pagination (default: 0) */
   offset?: number;
-  /** Filter by network (e.g., "starknet:sepolia") */
+  /** Filter by network */
   network?: string;
   /** Filter by category */
   category?: string;

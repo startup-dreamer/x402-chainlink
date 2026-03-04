@@ -21,7 +21,7 @@
     "rootDir": ".",
     "baseUrl": ".",
     "paths": {
-      "x402-starknet": ["./src/index.ts"]
+      "x402-chainlink": ["./src/index.ts"]
     }
   },
   "include": ["examples/**/*", "src/**/*"],

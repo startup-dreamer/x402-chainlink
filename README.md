@@ -1,26 +1,39 @@
 <div style="text-align:center" align="center">
     <a href="https://chain.link" target="_blank">
-        <img src="https://raw.githubusercontent.com/smartcontractkit/chainlink/develop/docs/logo-chainlink-blue.svg" width="225" alt="Chainlink logo">
+        <img src="./assets/logo.png" width="255" alt="Chainlink logo">
     </a>
 
 ![npm downloads](https://img.shields.io/npm/dt/x402-chainlink?style=flat&label=npm%20downloads&color=green)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Chainlink Runtime Environment Documentation](https://img.shields.io/static/v1?label=cre-docs&message=latest&color=yellow)](https://docs.chain.link/cre)
 
+[![sdk-docs](https://img.shields.io/static/v1?label=sdk-docs&message=latest&color=yellow)](https://startup-dreamer.github.io/x402-chainlink/)
+
 </div>
+
+## Preface
+
+Monetizing Web3 APIs today means either building a centralized database to track user deposits, or forcing users to sign clunky, expensive transactions for every API call.
+
+**x402-Chainlink solves this.** Instead of a centralized processor acting as the middleman, we use **Chainlink CRE** as a verifiable, decentralized backend. The x402 protocol handles the HTTP-level negotiation, allowing servers to demand payment and clients to automatically fulfill it via smart contracts, returning a cryptographically secure token (like a [Macaroon](https://research.google/pubs/pub41892/)) to access the resource.
 
 # x402-chainlink
 
 ## Overview
 
-Push Engine is a service that bridges off-chain data streams with on-chain smart contracts. It continuously monitors off-chain price updates and pushes them on-chain based on predefined conditions such as price deviations or time intervals.
+x402-chainlink is a self-sovereign payment SDK that acts as the "Stripe for Web3." It enables developers to seamlessly monetize APIs, digital resources, and AI agent workflows using standard HTTP 402 (Payment Required) protocols, entirely secured by the Chainlink Runtime Environment (CRE).
 
-### Key Features:
+Unlike centralized payment processors or clunky escrow contracts, x402 allows users to maintain absolute custody of their funds. Buyers simply sign an off-chain intent to pay, and the Chainlink Decentralized Oracle Network (DON) handles the rest—verifying balances and executing trustless, atomic settlements on-chain.
 
-- Retrieves and verifies price data from Chainlink Data Streams.
-- Writes verified prices to on-chain smart contracts.
-- Supports containerized deployment with Docker.
-- Configurable through environment variables and Redis-based settings.
+
+**Key Features**
+
+* **Machine-to-Machine (M2M) Payments:** Designed natively for the agentic economy. AI agents and headless clients can seamlessly intercept 402 responses, request cryptographic signatures, and pay for the resources they consume autonomously.
+* **Universal API & dApp Gating:** Standardized HTTP headers (`PAYMENT-REQUIRED`, `PAYMENT-SIGNATURE`) provide a drop-in solution to gate premium API endpoints, exclusive dApp features, or digital downloads without building complex, centralized paywalls.
+* **Extensible Architecture (Custom Modules):** The SDK ships with a built-in `ExtensionRegistry` featuring strict JSON schema validation. Developers can easily extend the base protocol to build custom Web3 billing models like **metered usage**, **recurring subscriptions**, **tipping**, or receipt generation.
+* **True Self-Sovereignty (EIP-712):** No centralized deposits or hot wallets. Users hold their keys and authorize payments via secure, off-chain cryptographic signatures.
+* **Gasless User Experience (EIP-2612):** Built-in support for token permits eliminates the friction of separate, expensive "Approve" and "Transfer" transactions. Users experience a one-click checkout.
+* **Unstoppable Settlement:** Chainlink DONs provide Byzantine Fault Tolerant (BFT) consensus to verify signatures and settle the final token transfers trustlessly via the `X402Facilitator` smart contract.
 
 ---
 
@@ -269,3 +282,25 @@ This project is open-source and actively seeking contributions. Future roadmap i
 ---
 
 *Empowering the next generation of the decentralized web with seamless, borderless micro-monetization.*
+
+
+
+
+Here is the revised Overview section. It keeps the core technical reality of the SDK intact (HTTP 402, EIP-712, Chainlink CRE settlement) but completely reframes the narrative around the massive potential of the Machine-to-Machine (M2M) economy and autonomous AI agents.
+
+---
+
+### Overview
+
+**x402-chainlink** is a self-sovereign, machine-to-machine (M2M) payment SDK designed specifically for the Agentic Economy. It enables autonomous AI Agents to trustlessly pay for premium APIs, private data, and complex computations using crypto, with settlement entirely secured by the Chainlink Runtime Environment (CRE).
+
+Unlike humans, AI agents cannot "click a button" to connect a browser wallet or pass a CAPTCHA to pay for a service. They require a programmatic negotiation layer. Furthermore, standard fiat rails cannot support the $0.05 micro-payments required for high-frequency AI API consumption, and pre-funding centralized developer accounts forces users to give up custody of their funds.
+
+This SDK solves this by standardizing the **HTTP 402 (Payment Required)** flow for AI frameworks (like LangChain or AutoGPT). When an AI agent hits a paywall, it receives a machine-readable price quote. It checks its local budget, cryptographically signs an off-chain intent to pay, and retries the request. The Chainlink Decentralized Oracle Network (DON) intercepts the signature, verifies it, and executes a trustless, atomic settlement on-chain before the data is served.
+
+**Core Features**
+
+* **Autonomous Pay-As-You-Go:** No centralized escrow or pre-paid credits. Agents maintain absolute custody of their EVM private keys and pay precisely per API call.
+* **Programmatic Negotiation:** Standardized `PAYMENT-REQUIRED` and `PAYMENT-SIGNATURE` HTTP headers allow any AI agent to natively "understand" paywalls and resolve them automatically.
+* **Viable Micro-Payments:** Built-in gasless token permits (EIP-2612) combined with Layer 2 networks make tiny, fractional payments economically feasible for agentic workflows.
+* **Unstoppable Settlement:** Chainlink DONs provide Byzantine Fault Tolerant (BFT) consensus to verify agent signatures and settle the final token transfers trustlessly via the `X402Facilitator` contract.
