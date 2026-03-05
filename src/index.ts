@@ -49,3 +49,4 @@ export * from './discovery/index.js';
 export * from './extensions/index.js';
 export * from './types/schemas.js';
 export * from './errors.js';
+export * from './contracts/deployments.js';

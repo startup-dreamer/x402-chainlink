@@ -23,6 +23,7 @@ import {
   encodePaymentPayload,
   signPaymentPayload,
   signPermit,
+  chainIdFromNetwork,
   type PaymentRequired,
   type SettleResponse,
 } from '@/lib/payment-client';
@@ -247,7 +248,7 @@ export default function WeatherClient() {
             USDC_VERSION,
             facilitatorAddress,
             requirements.amount,
-            84532,
+            chainIdFromNetwork(requirements.network),
             nonce,
             permitDeadline
           );

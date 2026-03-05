@@ -41,20 +41,4 @@ production-settings:
       url: https://mainnet.optimism.io
 
   account:
-    # Production workflow owner address
-    # WARNING: This should be a secure multisig or hardware wallet address
     workflow-owner-address: ''
-
-# ============================================================================
-# Forwarder Addresses (Reference)
-# ============================================================================
-#
-# MockForwarder (for simulation):
-#   - Base Sepolia: 0x15fC6ae953E024d975e77382eEeC56A9101f9F88
-#   - Ethereum Sepolia: 0x15fC6ae953E024d975e77382eEeC56A9101f9F88
-#
-# KeystoneForwarder (for production):
-#   - Base Sepolia: 0x1a1c2103A4BCb04F548e9525D4cc33Ac47f1Ec44
-#   - Ethereum Sepolia: 0xF8344CFd5c43616a4366C34E3EEE75af79a74482
-#
-# ============================================================================

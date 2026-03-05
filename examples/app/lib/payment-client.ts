@@ -122,7 +122,8 @@ const X402_EIP712_TYPES = {
 
 // ── CAIP-2 → chain ID ────────────────────────────────────────────────────────
 
-function chainIdFromNetwork(network: string): number {
+/** Parse a CAIP-2 EVM network identifier into a numeric chain ID. */
+export function chainIdFromNetwork(network: string): number {
   const match = /^eip155:(\d+)$/.exec(network);
   if (!match?.[1]) throw new Error(`Unsupported network: ${network}`);
   return parseInt(match[1], 10);

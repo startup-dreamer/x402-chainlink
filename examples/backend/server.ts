@@ -20,6 +20,7 @@ import {
   encodePaymentResponse,
   decodePaymentSignature,
   HTTP_HEADERS,
+  FACILITATOR_DEPLOYMENTS,
   type PaymentPayload,
   type PaymentRequirements,
   type PaymentRequired,
@@ -49,9 +50,9 @@ const PORT = process.env.EXPRESS_PORT ?? 3001;
 const RECIPIENT_ADDRESS = (process.env.RECEIVER_ADDRESS ??
   process.env.RECIPIENT_ADDRESS ??
   '0x0000000000000000000000000000000000000000') as `0x${string}`;
-const FACILITATOR_ADDRESS = (process.env.FACILITATOR_ADDRESS ??
-  '0x0000000000000000000000000000000000000000') as `0x${string}`;
 const NETWORK = 'eip155:84532' as const; // Base Sepolia
+const FACILITATOR_ADDRESS = (process.env.FACILITATOR_ADDRESS ??
+  FACILITATOR_DEPLOYMENTS[NETWORK]?.address) as `0x${string}`;
 
 const BROADCAST_ENABLED = process.env.CRE_BROADCAST === 'true';
 const CRE_TARGET = process.env.CRE_TARGET ?? 'staging-settings';

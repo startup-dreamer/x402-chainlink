@@ -6,6 +6,7 @@
  */
 
 import type { PaymentRequirements } from "x402-chainlink";
+import { FACILITATOR_DEPLOYMENTS } from "x402-chainlink";
 
 export const NETWORK = "eip155:84532" as const; // Base Sepolia
 
@@ -14,7 +15,7 @@ export const USDC_PRICE_MICRO = "1000"; // 0.001 USDC (6 decimals)
 export function getWeatherPaymentRequirements(): PaymentRequirements {
   const receiverAddress = process.env.RECEIVER_ADDRESS as `0x${string}`;
   const facilitatorAddress = (process.env.FACILITATOR_ADDRESS ??
-    "0x0000000000000000000000000000000000000000") as `0x${string}`;
+    FACILITATOR_DEPLOYMENTS[NETWORK]?.address) as `0x${string}`;
 
   if (!receiverAddress) {
     throw new Error("RECEIVER_ADDRESS environment variable is not set");

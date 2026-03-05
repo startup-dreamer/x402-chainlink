@@ -1,6 +1,6 @@
 {
   "name": "x402-chainlink",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Chainlink CRE implementation of the x402 payment protocol for EVM chains",
   "type": "module",
   "main": "./dist/index.js",
