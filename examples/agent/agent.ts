@@ -259,9 +259,17 @@ async function executeWeatherPayment(
     message: string;
     payer?: string;
     settlementId?: string;
+    transaction?: string;
   };
 
-  return { data: data.data, settlementId: data.settlementId ?? null };
+  if (data.transaction) {
+    console.log(
+      `  [Settlement] Done — tx: https://sepolia.basescan.org/tx/${data.transaction}`
+    );
+    console.log('');
+  }
+
+  return { data: data.data, settlementId: null };
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -328,7 +336,6 @@ async function main() {
       // Tool call — only get_weather is registered
       if (response.type === 'tool_call' && response.name === 'get_weather') {
         let toolResult: unknown;
-        let settlementId: string | null = null;
 
         try {
           const result = await executeWeatherPayment(
@@ -337,19 +344,10 @@ async function main() {
             response.args
           );
           toolResult = result.data;
-          settlementId = result.settlementId;
         } catch (err) {
           const msg = err instanceof Error ? err.message : String(err);
           console.error(`\n  [Error] ${msg}\n`);
           toolResult = { error: msg, weather: null };
-        }
-
-        // Wait for settlement before showing the weather response
-        if (settlementId) {
-          console.log(
-            '  [Settlement] Waiting for Chainlink CRE confirmation...'
-          );
-          await watchSettlement(settlementId).catch(() => {});
         }
 
         // Feed result back to Gemini and get the natural-language reply

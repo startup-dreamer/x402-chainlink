@@ -28,7 +28,7 @@ import {
 } from 'x402-chainlink';
 
 try {
-  const envPath = new URL('./.env.local', import.meta.url);
+  const envPath = new URL('./.env', import.meta.url);
   const lines = readFileSync(envPath, 'utf-8').split('\n');
   for (const line of lines) {
     const trimmed = line.trim();
@@ -358,7 +358,7 @@ async function runSettlement(
   payload: PaymentPayload,
   requirements: PaymentRequirements,
   settlementId: string
-): Promise<void> {
+): Promise<SettleResponse> {
   const emitter = getOrCreateEmitter(settlementId);
 
   emitter.emit('update', {
@@ -434,6 +434,7 @@ async function runSettlement(
 
   emitter.emit('complete', result);
   setTimeout(() => cleanupEmitter(settlementId), 10_000);
+  return result;
 }
 
 const app = express();
@@ -540,6 +541,21 @@ app.get(
       return;
     }
 
+    const settlement = await runSettlement(
+      payload,
+      weatherRequirements,
+      settlementId
+    );
+
+    if (!settlement.success) {
+      res.status(402).json({
+        error: 'Settlement failed',
+        reason: settlement.errorReason,
+        settlementId,
+      });
+      return;
+    }
+
     res.json({
       success: true,
       data: weatherData,
@@ -547,11 +563,8 @@ app.get(
         'Live weather data retrieved. Protected by x402 via Chainlink CRE.',
       payer: payload.payload.authorization.from,
       settlementId,
+      transaction: settlement.transaction,
     });
-
-    runSettlement(payload, weatherRequirements, settlementId).catch(
-      console.error
-    );
   }
 );
 
@@ -624,23 +637,35 @@ app.get(
   '/api/premium',
   requirePayment(premiumRequirements),
   async (req: PaymentRequest, res: Response): Promise<void> => {
+    if (!req.payment) {
+      res.status(500).json({ error: 'Payment missing' });
+      return;
+    }
+
     const settlementId = crypto.randomUUID();
+    const settlement = await runSettlement(
+      req.payment.payload,
+      premiumRequirements,
+      settlementId
+    );
+
+    if (!settlement.success) {
+      res.status(402).json({
+        error: 'Settlement failed',
+        reason: settlement.errorReason,
+        settlementId,
+      });
+      return;
+    }
 
     res.json({
       message: 'Welcome to the premium API!',
       secret: 'The answer is 42',
-      payer: req.payment?.payload.payload.authorization.from,
+      payer: req.payment.payload.payload.authorization.from,
       timestamp: new Date().toISOString(),
       settlementId,
+      transaction: settlement.transaction,
     });
-
-    if (req.payment) {
-      runSettlement(
-        req.payment.payload,
-        premiumRequirements,
-        settlementId
-      ).catch(console.error);
-    }
   }
 );
 
@@ -655,7 +680,26 @@ app.get(
   '/api/expensive',
   requirePayment(expensiveRequirements),
   async (req: PaymentRequest, res: Response): Promise<void> => {
+    if (!req.payment) {
+      res.status(500).json({ error: 'Payment missing' });
+      return;
+    }
+
     const settlementId = crypto.randomUUID();
+    const settlement = await runSettlement(
+      req.payment.payload,
+      expensiveRequirements,
+      settlementId
+    );
+
+    if (!settlement.success) {
+      res.status(402).json({
+        error: 'Settlement failed',
+        reason: settlement.errorReason,
+        settlementId,
+      });
+      return;
+    }
 
     res.json({
       message: 'Welcome to the exclusive API!',
@@ -663,18 +707,11 @@ app.get(
         value: 'This is very valuable data',
         analysis: 'Deep insights here',
       },
-      payer: req.payment?.payload.payload.authorization.from,
+      payer: req.payment.payload.payload.authorization.from,
       timestamp: new Date().toISOString(),
       settlementId,
+      transaction: settlement.transaction,
     });
-
-    if (req.payment) {
-      runSettlement(
-        req.payment.payload,
-        expensiveRequirements,
-        settlementId
-      ).catch(console.error);
-    }
   }
 );
 
