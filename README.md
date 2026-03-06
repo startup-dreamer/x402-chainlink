@@ -321,8 +321,13 @@ bun run dev
 
 ### AI agent/Backend workflow example:
 
+<!--
+  GitHub-flavored markdown ignores CSS and only accepts certain HTML attributes for images.
+  To make the GIF scale responsively to the full width of the README, omit fixed width and set width="100%", 
+  but the actual display will max out at GitHub's content width.
+-->
 <p align="center">
-  <img src="./assets/x402-chainlink_1.gif" width="600"/>
+  <img src="./assets/x402-chainlink_1.gif" width="100%" style="max-width:100%;height:auto;" alt="x402-chainlink demo"/>
 </p>
 
 Workflow tx: [0x516df53fbc3f38f92bfa403916c3c6eb0b014c3f6d086fad2073865029fea517](https://sepolia.basescan.org/tx/0x516df53fbc3f38f92bfa403916c3c6eb0b014c3f6d086fad2073865029fea517)
