@@ -322,7 +322,7 @@ bun run dev
 ### AI agent/Backend workflow example:
 
 <p align="center">
-  <img src="./assets/x402-chainlink.gif" width="600"/>
+  <img src="./assets/x402-chainlink_1.gif" width="600"/>
 </p>
 
 Workflow tx: [0x516df53fbc3f38f92bfa403916c3c6eb0b014c3f6d086fad2073865029fea517](https://sepolia.basescan.org/tx/0x516df53fbc3f38f92bfa403916c3c6eb0b014c3f6d086fad2073865029fea517)
