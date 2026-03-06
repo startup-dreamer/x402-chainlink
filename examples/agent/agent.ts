@@ -23,7 +23,7 @@ config();
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY ?? '';
 const GEMINI_MODEL = process.env.GEMINI_MODEL ?? DEFAULT_MODEL;
-const SENDER_PRIVATE_KEY = (process.env.SENDER_PRIVATE_KEY ??
+const AGENTS_PRIVATE_KEY = (process.env.AGENTS_PRIVATE_KEY ??
   '') as `0x${string}`;
 const BACKEND_URL = (
   process.env.BACKEND_URL ?? 'http://localhost:3001'
@@ -46,7 +46,7 @@ function printBanner() {
   console.log(`  Model:    ${GEMINI_MODEL}`);
   console.log(`  Backend:  ${BACKEND_URL}`);
   console.log(`  Network:  Base Sepolia (eip155:84532)`);
-  console.log(`  Wallet:   ${SENDER_PRIVATE_KEY ? '✓ loaded' : '✗ MISSING'}`);
+  console.log(`  Wallet:   ${AGENTS_PRIVATE_KEY ? '✓ loaded' : '✗ MISSING'}`);
   console.log(hr('═'));
   console.log('  Type "exit" or "quit" to stop.');
   console.log(hr('─'));
@@ -275,9 +275,9 @@ async function main() {
     console.error('       Then set it in examples/agent/.env');
     process.exit(1);
   }
-  if (!SENDER_PRIVATE_KEY || SENDER_PRIVATE_KEY === '0x') {
+  if (!AGENTS_PRIVATE_KEY || AGENTS_PRIVATE_KEY === '0x') {
     console.error(
-      'ERROR: SENDER_PRIVATE_KEY is not set. Set it in examples/agent/.env'
+      'ERROR: AGENTS_PRIVATE_KEY is not set. Set it in examples/agent/.env'
     );
     process.exit(1);
   }
@@ -285,7 +285,7 @@ async function main() {
   printBanner();
 
   // Create viem wallet
-  const { walletClient } = createAgentWallet(SENDER_PRIVATE_KEY);
+  const { walletClient } = createAgentWallet(AGENTS_PRIVATE_KEY);
 
   // Start Gemini chat session
   const chat = createChatSession(GEMINI_API_KEY, GEMINI_MODEL);

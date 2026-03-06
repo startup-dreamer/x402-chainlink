@@ -161,13 +161,13 @@ export default function WeatherClient() {
     setSettlementStatus(null);
     setPaymentInfo(null);
 
-    const privateKey = process.env.NEXT_PUBLIC_SENDER_PRIVATE_KEY as
+    const privateKey = process.env.NEXT_PUBLIC_AGENTS_PRIVATE_KEY as
       | `0x${string}`
       | undefined;
 
     if (!privateKey) {
       setError(
-        'NEXT_PUBLIC_SENDER_PRIVATE_KEY is not set. See .env.local.example'
+        'NEXT_PUBLIC_AGENTS_PRIVATE_KEY is not set. See .env.local.example'
       );
       setAgentStep('error');
       return;

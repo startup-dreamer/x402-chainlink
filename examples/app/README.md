@@ -69,11 +69,11 @@ cp .env.local.example .env.local
 Edit `.env.local`:
 
 ```env
-NEXT_PUBLIC_SENDER_PRIVATE_KEY=0x...your_testnet_private_key
+NEXT_PUBLIC_AGENTS_PRIVATE_KEY=0x...your_testnet_private_key
 RECEIVER_ADDRESS=0x...your_receiver_address
 ```
 
-> **Security**: `NEXT_PUBLIC_SENDER_PRIVATE_KEY` is exposed to the browser (intentional for demo). Use a testnet-only wallet with minimal funds.
+> **Security**: `NEXT_PUBLIC_AGENTS_PRIVATE_KEY` is exposed to the browser (intentional for demo). Use a testnet-only wallet with minimal funds.
 
 ### 4. Get testnet USDC
 
@@ -109,6 +109,7 @@ The UI shows **PAYMENT VERIFIED** with a note that settlement was simulated.
 This mode runs the actual CRE workflow locally and optionally broadcasts a real transaction.
 
 **Prerequisites:**
+
 1. Install the Chainlink CRE CLI: [docs.chain.link/cre](https://docs.chain.link/cre)
 2. Deploy `X402Facilitator.sol` from `../x402-chainlink/contracts/src/`:
    ```bash
@@ -124,6 +125,7 @@ This mode runs the actual CRE workflow locally and optionally broadcasts a real 
    ```
 
 With `CRE_BROADCAST=true`, the settlement runs:
+
 ```
 cre workflow simulate ../x402-chainlink/x402-workflow \
   --target staging-settings \
@@ -164,14 +166,14 @@ chainlink-x402-starter-kit/
 
 ## Environment Variables
 
-| Variable | Required | Description |
-|---|---|---|
-| `NEXT_PUBLIC_SENDER_PRIVATE_KEY` | Yes | Payer private key (testnet only, exposed to browser) |
-| `RECEIVER_ADDRESS` | Yes | Wallet that receives USDC payments |
-| `FACILITATOR_ADDRESS` | For broadcast | X402Facilitator contract on Base Sepolia |
-| `WORKFLOW_PATH` | For CRE | Path to x402-workflow dir (default: `../x402-chainlink/x402-workflow`) |
-| `CRE_TARGET` | For CRE | CRE target settings name (default: `staging-settings`) |
-| `CRE_BROADCAST` | For real txs | Set `true` to broadcast to Base Sepolia |
+| Variable                         | Required      | Description                                                            |
+| -------------------------------- | ------------- | ---------------------------------------------------------------------- |
+| `NEXT_PUBLIC_AGENTS_PRIVATE_KEY` | Yes           | Payer private key (testnet only, exposed to browser)                   |
+| `RECEIVER_ADDRESS`               | Yes           | Wallet that receives USDC payments                                     |
+| `FACILITATOR_ADDRESS`            | For broadcast | X402Facilitator contract on Base Sepolia                               |
+| `WORKFLOW_PATH`                  | For CRE       | Path to x402-workflow dir (default: `../x402-chainlink/x402-workflow`) |
+| `CRE_TARGET`                     | For CRE       | CRE target settings name (default: `staging-settings`)                 |
+| `CRE_BROADCAST`                  | For real txs  | Set `true` to broadcast to Base Sepolia                                |
 
 ---
 

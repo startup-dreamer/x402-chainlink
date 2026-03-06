@@ -30,10 +30,13 @@ export default function Home() {
 
         <WeatherClient />
 
-        {!process.env.NEXT_PUBLIC_SENDER_PRIVATE_KEY && (
+        {!process.env.NEXT_PUBLIC_AGENTS_PRIVATE_KEY && (
           <div className="env-warning">
-            <span>⚠ MISSING NEXT_PUBLIC_SENDER_PRIVATE_KEY</span>
-            <p>Copy .env.local.example to .env.local and add your testnet private key.</p>
+            <span>⚠ MISSING NEXT_PUBLIC_AGENTS_PRIVATE_KEY</span>
+            <p>
+              Copy .env.local.example to .env.local and add your testnet private
+              key.
+            </p>
           </div>
         )}
       </main>
