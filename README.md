@@ -19,18 +19,20 @@ _**Empowering the next generation of the decentralized web with seamless, border
 </p>
 </center>
 
+# x402-chainlink
+
+
 ## Preface
 
-Monetizing Web3 APIs today means either building a centralized database to track user deposits, or forcing users to sign clunky, expensive transactions for every API call.
+Monetizing Web3 APIs and enabling headless AI agents to autonomously pay for the premium data today means either building a centralized database to track user deposits, or forcing users to sign clunky, expensive transactions for every API call.
 
 
-**x402-Chainlink** solves this. Instead of a centralized processor acting as the middleman, we use **Chainlink CRE** as a verifiable, decentralized backend. The x402 protocol handles the HTTP-level negotiation, allowing servers to demand payment and clients to automatically fulfill it via smart contracts, returning a cryptographically secure token (like a [Macaroon](https://research.google/pubs/pub41892/)) to access the resource.
+**x402-Chainlink** solves this. Instead of a centralized processor acting as the middleman, we use **Chainlink CRE** as a verifiable, decentralized backend. The x402 protocol handles the HTTP-level negotiation, allowing servers to demand payment and clients whether human users or autonomous AI agents to automatically fulfill it via smart contracts, returning a cryptographically secure token (like a [Macaroon](https://research.google/pubs/pub41892/)) to access the resource.
 
 
 - [sdk-docs](https://startup-dreamer.github.io/x402-chainlink/)
 - [npm-package](https://www.npmjs.com/package/x402-chainlink)
 
-# x402-chainlink
 
 ## Overview
 
@@ -38,17 +40,20 @@ x402-chainlink is a self-sovereign payment SDK that acts as the "**Stripe for We
 
 Unlike centralized payment processors or clunky escrow contracts, x402 allows users to maintain absolute custody of their funds. Buyers simply sign an off-chain intent to pay, and the Chainlink Decentralized Oracle Network (DON) handles the rest—verifying balances and executing trustless, atomic settlements on-chain.
 
+### Key Features
 
-**Key Features**
+**For the Agentic Economy**
+* **Machine-to-Machine (M2M) Payments:** AI agents and headless clients can autonomously intercept 402 responses, request cryptographic signatures, and pay for the resources they consume.
+* **Universal API & dApp Gating:** Drop-in, decentralized paywalls using standard HTTP headers (`PAYMENT-REQUIRED`, `PAYMENT-SIGNATURE`).
 
-* **Machine-to-Machine (M2M) Payments:** Designed natively for the agentic economy. AI agents and headless clients can seamlessly intercept 402 responses, request cryptographic signatures, and pay for the resources they consume autonomously.
-* **Universal API & dApp Gating:** Standardized HTTP headers (`PAYMENT-REQUIRED`, `PAYMENT-SIGNATURE`) provide a drop-in solution to gate premium API endpoints, exclusive dApp features, or digital downloads without building complex, centralized paywalls.
-* **Extensible Architecture (Custom Modules):** The SDK ships with a built-in `ExtensionRegistry` featuring strict JSON schema validation. Developers can easily extend the base protocol to build custom Web3 billing models like **metered usage**, **recurring subscriptions**, **tipping**, or receipt generation.
-* **True Self-Sovereignty (EIP-712):** No centralized deposits or hot wallets. Users hold their keys and authorize payments via secure, off-chain cryptographic signatures.
-* **Gasless User Experience (EIP-2612):** Built-in support for token permits eliminates the friction of separate, expensive "Approve" and "Transfer" transactions. Users experience a one-click checkout.
-* **Unstoppable Settlement:** Chainlink DONs provide Byzantine Fault Tolerant (BFT) consensus to verify signatures and settle the final token transfers trustlessly via the `X402Facilitator` smart contract.
+**For the Developer & User Experience**
+* **Gasless Checkout (EIP-2612):** Token permits eliminate separate, expensive "Approve" transactions, delivering a frictionless one-click UX.
+* **Extensible Architecture:** A built-in `ExtensionRegistry` with strict JSON schema validation makes it easy to add **metered usage**, **subscriptions**, or **tipping**.
 
-### Key Use Cases
+**For Security & Infrastructure**
+* **Unstoppable Settlement:** Chainlink DONs provide BFT consensus to verify signatures off-chain and settle token transfers trustlessly via the `X402Facilitator` contract.
+* **True Self-Sovereignty (EIP-712):** Zero centralized custody. Users authorize payments via secure, off-chain cryptographic signatures.
+### **Key Use Cases**
 
 1. **API Monetization (Machine-to-Machine):** Charge per API call without requiring users to buy subscriptions. Perfect for AI models, oracle data feeds, or heavy compute tasks.
 2. **Decentralized Paywalls:** Monetize premium content, articles, or digital media natively via user wallets.
@@ -237,9 +242,12 @@ export function PremiumArticle({ articleId }) {
 
 The core innovation of this project lies in moving the heavy lifting of payment verification off the primary application server and into the **Chainlink Runtime Environment**.
 
-* **Absolute Trust:** The server doesn't need to trust the client, and the client doesn't need to trust the server. The CRE acts as the decentralized, unbiased referee that verifies the on-chain settlement and issues the access credential.
-* **Chain Agnosticism:** Because CRE can observe multiple networks, your API can accept payments on Polygon, Base, Ethereum, or Arbitrum simultaneously without you having to run local RPC nodes for each.
-* **Low Latency:** CRE workflows execute securely and rapidly off-chain, ensuring the HTTP request-response cycle remains fast enough for modern web applications.
+
+| Benefit | How it works |
+| :--- | :--- |
+| **Absolute Trust** | The server and client are completely trustless. The CRE acts as the decentralized, unbiased referee that verifies the on-chain settlement and issues the access credential. |
+| **Chain Agnosticism** | Because CRE observes multiple networks natively, your API can accept payments on Polygon, Base, Ethereum, or Arbitrum simultaneously—zero local RPC nodes required. |
+| **Low Latency** | CRE workflows execute securely and rapidly off-chain, ensuring the HTTP request-response cycle remains blazing fast for modern web applications. |
 
 ## Running SDK Examples Locally
 
@@ -261,7 +269,7 @@ cd x402-chainlink
 cd examples/backend
 
 # Install backend dependencies
-npm install
+bun install
 
 # Create environment file
 cp .env.local .env.local  # Already exists, but you may want to customize
@@ -270,7 +278,7 @@ cp .env.local .env.local  # Already exists, but you may want to customize
 nano .env.local
 
 # Run the backend server
-npm run dev
+bun run dev
 ```
 
 
@@ -280,7 +288,7 @@ npm run dev
 cd examples/agent
 
 # Install agent dependencies
-npm install
+bun install
 
 # Create environment file
 cp .env.example .env
@@ -289,7 +297,7 @@ cp .env.example .env
 nano .env
 
 # Run the agent client
-npm start
+bun start
 ```
 Note: You need to have funded wallet to run the agent client.
 
@@ -299,7 +307,7 @@ Note: You need to have funded wallet to run the agent client.
 cd examples/app
 
 # Install frontend dependencies
-npm install
+bun install
 
 # Create environment file
 cp .env.local.example .env.local
@@ -308,7 +316,7 @@ cp .env.local.example .env.local
 nano .env.local
 
 # Run the frontend client
-npm run dev
+bun run dev
 ```
 
 <!-- ### AI agent workflow example: -->
