@@ -256,6 +256,17 @@ The core innovation of this project lies in moving the heavy lifting of payment 
 - npm or bun package manager
 - Chainlink CRE CLI (For simulation we sould spwan a cre client in simulation mode and run the workflow locally)
 
+> [!IMPORTANT]
+>
+> When running in **Simulation Mode**, the `x402-chainlink` SDK programmatically wraps the Chainlink `cre workflow simulate` CLI under the hood. 
+> This enables seamless local testing that perfectly mimics a production DON (Decentralized Oracle Network).
+>
+> Because of this architecture, **you must be actively logged into the CRE environment** via your terminal for local workflow executions to succeed.
+>
+> *(Note: While the SDK is fully designed for live production environments, Chainlink CRE deployments are not yet publicly available. Once public, you can easily switch off Simulation Mode to natively target live DONs without the local CLI wrapper.)*
+> 
+
+
 1. **Clone & Install:**
 ```bash
 git clone https://github.com/your-org/x402-chainlink_1.git
