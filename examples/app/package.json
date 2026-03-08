@@ -14,7 +14,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "viem": "2.46.2",
-    "x402-chainlink": "^1.0.0"
+    "x402-chainlink": "^1.0.4"
   },
   "overrides": {
     "viem": "2.46.2"
