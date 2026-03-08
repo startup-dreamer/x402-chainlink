@@ -347,7 +347,7 @@ Workflow tx: [0x516df53fbc3f38f92bfa403916c3c6eb0b014c3f6d086fad2073865029fea517
 
 This project is open-source and actively seeking contributions. Future roadmap items include:
 
-* Making the production deployment of the SDK with Chainlink CRE.
+* Making the production deployment of the SDK with Chainlink CRE and expanding it to other chains.
 * Subscription/recurring payment models using Chainlink Automation.
 * Native browser extension for background x402 automated settlements.
 * Native integration with LangChain and AutoGPT.
